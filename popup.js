@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     baseUrl: 'https://api.indobelajar.com',
     apiKey: 'my-secure-secret-key-2024',        // Sama dengan di server
     secretKey: 'my-secure-secret-key-2024',     // Sama dengan di server
-    extensionId: 'kjhmiklmjkbffnopmpfgcchikdcmpnnn'  // Extension ID Chrome Anda
+    extensionId: 'kkimaokajhpnijhkfmilcagehocjncpl'  // Extension ID Chrome Anda
   };
 
   // Generate HMAC signature
