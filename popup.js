@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Generate answer with AI
-  generateAnswerBtn.addEventListener('click', function() {
+  generateAnswerBtn.addEventListener('click', async function() {
     if (!extractedText) {
       showStatus('No text extracted. Please refresh the page and try again.', 'error');
       return;
