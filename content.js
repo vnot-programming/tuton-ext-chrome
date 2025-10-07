@@ -1,0 +1,208 @@
+// Content script for UT E-Learning Text Grabber & AI Assistant
+
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'grabText') {
+    grabTextFromPage()
+      .then(text => {
+        sendResponse({ success: true, text: text });
+      })
+      .catch(error => {
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // Keep message channel open for async response
+  }
+  
+});
+
+// Function to grab text from the current page
+async function grabTextFromPage() {
+  try {
+    // Wait for page to be fully loaded
+    await waitForPageLoad();
+    
+    let extractedText = '';
+    
+    // Check if we're on a forum discussion page
+    if (window.location.href.includes('/mod/forum/discuss.php')) {
+      extractedText = extractForumDiscussionText();
+    }
+    // Check if we're on a course content page
+    else if (window.location.href.includes('/mod/') || window.location.href.includes('/course/')) {
+      extractedText = extractCourseContentText();
+    }
+    // General text extraction for other pages
+    else {
+      extractedText = extractGeneralPageText();
+    }
+    
+    if (!extractedText.trim()) {
+      throw new Error('No relevant text found on this page');
+    }
+    
+    return extractedText;
+  } catch (error) {
+    throw new Error(`Failed to extract text: ${error.message}`);
+  }
+}
+
+// Extract text from forum discussion pages
+function extractForumDiscussionText() {
+  let text = '';
+  let processedPosts = new Set(); // To avoid duplicates
+  
+  // Get all forum posts (including main post and replies)
+  const forumPosts = document.querySelectorAll('.forumpost, [data-content="forum-post"], .forum-post-container');
+  
+  if (forumPosts.length > 0) {
+    let postIndex = 1;
+    
+    forumPosts.forEach((post) => {
+      // Get the post ID to avoid duplicates
+      const postId = post.getAttribute('data-post-id') || post.id;
+      if (processedPosts.has(postId)) {
+        return; // Skip if already processed
+      }
+      processedPosts.add(postId);
+      
+      // Get author information
+      const authorElement = post.querySelector('a[href*="/user/view.php"]');
+      const timeElement = post.querySelector('time');
+      
+      if (authorElement && timeElement) {
+        text += `Post ${postIndex} - ${authorElement.textContent.trim()} (${timeElement.textContent.trim()}):\n`;
+      }
+      
+      // Get the post content - this is the main part we want
+      const postContent = post.querySelector('.post-content-container, [id^="post-content-"]');
+      if (postContent) {
+        text += postContent.innerText.trim() + '\n\n';
+        postIndex++;
+      } else {
+        // Fallback: get any content within the post
+        const fallbackContent = post.querySelector('.content, .post-content, .body-content-container');
+        if (fallbackContent) {
+          text += fallbackContent.innerText.trim() + '\n\n';
+          postIndex++;
+        }
+      }
+    });
+  } else {
+    // Fallback: try to get any forum-related content
+    const discussionContent = document.querySelector('.forum-post-content, .post-content, .discussion-content');
+    if (discussionContent) {
+      text += 'Forum Content:\n';
+      text += discussionContent.innerText + '\n\n';
+    }
+  }
+  
+  // If still no content, try to get main content area
+  if (!text.trim()) {
+    const mainContent = document.querySelector('main, .main-content, .content, #content');
+    if (mainContent) {
+      text = mainContent.innerText;
+    }
+  }
+  
+  return text.trim();
+}
+
+// Extract text from course content pages
+function extractCourseContentText() {
+  let text = '';
+  
+  // Get course title
+  const courseTitle = document.querySelector('.course-title, h1, .page-title');
+  if (courseTitle) {
+    text += 'Course: ' + courseTitle.innerText + '\n\n';
+  }
+  
+  // Get main content
+  const mainContent = document.querySelector('.course-content, .content, main, .main-content');
+  if (mainContent) {
+    text += mainContent.innerText;
+  }
+  
+  // Get any additional content sections
+  const contentSections = document.querySelectorAll('.content-section, .lesson-content, .module-content');
+  contentSections.forEach((section, index) => {
+    if (section.innerText.trim()) {
+      text += `\n\nSection ${index + 1}:\n`;
+      text += section.innerText;
+    }
+  });
+  
+  return text.trim();
+}
+
+// Extract general text from any page
+function extractGeneralPageText() {
+  let text = '';
+  
+  // Get page title
+  const pageTitle = document.querySelector('h1, .page-title, title');
+  if (pageTitle) {
+    text += 'Page Title: ' + pageTitle.innerText + '\n\n';
+  }
+  
+  // Get main content area
+  const mainContent = document.querySelector('main, .main-content, .content, #content, .container');
+  if (mainContent) {
+    text += mainContent.innerText;
+  } else {
+    // Fallback to body content
+    text += document.body.innerText;
+  }
+  
+  return text.trim();
+}
+
+
+// Helper function to wait for page to be fully loaded
+function waitForPageLoad() {
+  return new Promise((resolve) => {
+    if (document.readyState === 'complete') {
+      resolve();
+    } else {
+      window.addEventListener('load', resolve);
+    }
+  });
+}
+
+// Add visual indicator when extension is active
+function addExtensionIndicator() {
+  // Create a small indicator that the extension is active
+  const indicator = document.createElement('div');
+  indicator.id = 'ut-extension-indicator';
+  indicator.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    z-index: 10000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    opacity: 0.8;
+  `;
+  indicator.textContent = '🎓 UT Assistant Active';
+  document.body.appendChild(indicator);
+  
+  // Remove indicator after 3 seconds
+  setTimeout(() => {
+    if (indicator.parentNode) {
+      indicator.parentNode.removeChild(indicator);
+    }
+  }, 3000);
+}
+
+// Initialize extension indicator when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', addExtensionIndicator);
+} else {
+  addExtensionIndicator();
+}
+
