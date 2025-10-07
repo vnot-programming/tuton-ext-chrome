@@ -6,7 +6,7 @@ echo "🔧 Fixing Git configuration..."
 
 # Set Git user identity
 git config --global user.name "vnot-programming"
-git config --global user.email "vnot-programming@users.noreply.github.com"
+git config --global user.email "feri@unu-jogja.ac.id"
 
 echo "✅ Git user identity configured"
 
