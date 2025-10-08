@@ -5,8 +5,7 @@
   "description": "Grab text from UT e-learning platform and generate answers using Gemini AI",
   "permissions": [
     "activeTab",
-    "storage",
-    "scripting"
+    "storage"
   ],
   "host_permissions": [
     "https://elearning.ut.ac.id/*",

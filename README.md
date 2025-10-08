@@ -86,7 +86,6 @@ tuton-ext-chrome/
 Extension memerlukan permission berikut:
 - `activeTab`: Untuk akses halaman aktif
 - `storage`: Untuk simpan settings
-- `scripting`: Untuk inject content script
 - Host permissions untuk:
   - `https://elearning.ut.ac.id/*`
   - `https://generativelanguage.googleapis.com/*`

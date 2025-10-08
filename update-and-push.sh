@@ -21,14 +21,15 @@ git add .
 
 # Commit changes
 echo "💾 Committing changes..."
-git commit -m "Update: Chrome Extension v1.0.0-alpha with QR Code Donation
+git commit -m "Fix: Remove unused 'scripting' permission for Chrome Web Store compliance
 
-- Added CHANGELOG.md and RELEASE_NOTES.md for v1.0.0-alpha
-- Added QR code donation section with Saweria integration
-- Added 'Jazakumullah Khairan' message for donations
-- Updated .gitignore to exclude internal scripts
-- Enhanced documentation with comprehensive release notes
-- Added assets/qr-saweria.png for donation QR code
+- Removed unused 'scripting' permission from manifest.json
+- Updated README.md to reflect correct permissions
+- Fixed Chrome Web Store policy violation (Purple Potassium)
+- Extension now only requests necessary permissions:
+  * activeTab: For accessing current page
+  * storage: For saving user settings
+- Content scripts are injected via manifest content_scripts, not scripting API
 
 Made with ❤️ for UT Toton"
 
