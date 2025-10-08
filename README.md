@@ -105,6 +105,12 @@ Extension menggunakan secure API server di `https://api.indobelajar.com/` untuk:
 
 ## 📝 Changelog
 
+### Version 1.1
+- Fixed Chrome Web Store compliance by removing unused 'scripting' permission
+- Updated documentation to reflect correct permissions
+- Enhanced security and policy compliance
+- Improved extension stability
+
 ### Version 1.0
 - Initial release
 - Auto text extraction dari forum UT
@@ -145,6 +151,8 @@ Jika extension ini membantu Anda dalam belajar di UT, pertimbangkan untuk member
 
 **Atau kunjungi:** [saweria.co/vnot01](https://saweria.co/vnot01)
 
+**🔗 Link Donasi Langsung:** [https://saweria.co/vnot01](https://saweria.co/vnot01)
+
 *Setiap donasi sangat berarti untuk pengembangan fitur-fitur baru!* 🙏
 
 </div>
@@ -154,8 +162,9 @@ Jika extension ini membantu Anda dalam belajar di UT, pertimbangkan untuk member
 Jika QR code tidak muncul, Anda bisa:
 
 1. **Kunjungi langsung:** [saweria.co/vnot01](https://saweria.co/vnot01)
-2. **Scan QR code di halaman Saweria** - QR code akan muncul di halaman tersebut
-3. **Transfer langsung** - Gunakan fitur transfer di aplikasi Saweria
+2. **Link Donasi Langsung:** [https://saweria.co/vnot01](https://saweria.co/vnot01)
+3. **Scan QR code di halaman Saweria** - QR code akan muncul di halaman tersebut
+4. **Transfer langsung** - Gunakan fitur transfer di aplikasi Saweria
 
 
 ## 🙏 Acknowledgments

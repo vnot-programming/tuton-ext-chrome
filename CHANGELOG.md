@@ -5,7 +5,26 @@ All notable changes to the UT E-Learning Text Grabber & AI Assistant Chrome Exte
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0-alpha] - 2025-01-07
+## [1.1] - 2025-10-08
+
+### Fixed
+- **Chrome Web Store Compliance**: Removed unused 'scripting' permission that was causing policy violation
+- **Permission Documentation**: Updated README.md to accurately reflect only used permissions
+- **Policy Violation**: Fixed "Purple Potassium" violation by removing unnecessary permission
+
+### Changed
+- **Manifest Version**: Updated from 1.0 to 1.1
+- **Permission Set**: Now only requests 'activeTab' and 'storage' permissions
+- **Documentation**: Enhanced permission justification and compliance information
+
+### Security
+- **Reduced Attack Surface**: Removed unused permission reduces potential security risks
+- **Policy Compliance**: Extension now fully compliant with Chrome Web Store policies
+- **Permission Audit**: Complete review of all permissions to ensure necessity
+
+---
+
+## [1.0.0-alpha] - 2025-10-08
 
 ### Added
 - **Initial Release** of UT E-Learning Text Grabber & AI Assistant
@@ -108,7 +127,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 1.0.0-alpha | 2025-01-07 | Initial alpha release with core functionality |
+| 1.1 | 2025-10-08 | Fixed Chrome Web Store compliance and permission issues |
+| 1.0.0-alpha | 2025-10-08 | Initial alpha release with core functionality |
 
 ---
 

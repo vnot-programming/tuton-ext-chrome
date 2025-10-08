@@ -21,15 +21,16 @@ git add .
 
 # Commit changes
 echo "💾 Committing changes..."
-git commit -m "Fix: Remove unused 'scripting' permission for Chrome Web Store compliance
+git commit -m "Release v1.1: Chrome Web Store compliance and permission fixes (October 8, 2025)
 
-- Removed unused 'scripting' permission from manifest.json
-- Updated README.md to reflect correct permissions
-- Fixed Chrome Web Store policy violation (Purple Potassium)
-- Extension now only requests necessary permissions:
-  * activeTab: For accessing current page
-  * storage: For saving user settings
-- Content scripts are injected via manifest content_scripts, not scripting API
+- Updated version from 1.0 to 1.1 in manifest.json
+- Fixed Chrome Web Store policy violation by removing unused 'scripting' permission
+- Updated all documentation (README, CHANGELOG, RELEASE_NOTES) for v1.1
+- Enhanced security by reducing permission attack surface
+- Extension now fully compliant with Chrome Web Store policies
+- Updated popup.html version display to 1.1
+- Added clickable donation link to Saweria in popup extension
+- Updated all dates to October 8, 2025
 
 Made with ❤️ for UT Toton"
 

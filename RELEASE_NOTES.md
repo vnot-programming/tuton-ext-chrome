@@ -1,16 +1,22 @@
 # Release Notes
 
-## 🎓 UT E-Learning Text Grabber & AI Assistant v1.0.0-alpha
+## 🎓 UT E-Learning Text Grabber & AI Assistant v1.1
 
-**Release Date:** January 7, 2025  
-**Version:** 1.0.0-alpha  
-**Status:** Alpha Release
+**Release Date:** October 8, 2025  
+**Version:** 1.1  
+**Status:** Stable Release
 
 ---
 
-## 🚀 What's New
+## 🚀 What's New in v1.1
 
-### ✨ Core Features
+### 🔧 Bug Fixes & Improvements
+- **✅ Chrome Web Store Compliance**: Fixed policy violation by removing unused 'scripting' permission
+- **📋 Permission Audit**: Extension now only requests necessary permissions ('activeTab' and 'storage')
+- **🛡️ Enhanced Security**: Reduced attack surface by removing unnecessary permissions
+- **📚 Updated Documentation**: Accurate permission documentation and compliance information
+
+### ✨ Core Features (from v1.0)
 - **🎯 Smart Text Extraction** - Automatically grabs text from UT e-learning forum discussions and course content
 - **🤖 Multi-AI Support** - Choose from Gemini 2.5 Flash, Gemini 2.5 Pro, Gemini 2.0 Flash, OpenAI GPT-4, or Claude 3.5 Sonnet
 - **🔐 Secure API Integration** - Your API keys are stored safely on our secure server
@@ -156,7 +162,7 @@
 - **Developer** - Direct support from the development team
 
 ### 🐛 Known Issues
-- **None** - This is a stable initial release
+- **None** - This is a stable release with all major issues resolved
 - **Future Updates** - Regular updates and improvements planned
 - **Feedback Welcome** - We value your input and suggestions
 
