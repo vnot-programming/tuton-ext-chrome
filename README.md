@@ -128,7 +128,36 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Feri Febria Laksana**
-- Made with ❤️ for UT students
+- Made with ❤️ for UT Toton
+
+## 💝 Donate
+
+Jika extension ini membantu Anda dalam belajar di UT, pertimbangkan untuk memberikan dukungan:
+
+<div align="center">
+
+### ☕ Support Development
+
+**Scan QR Code untuk donasi via Saweria:**
+
+[![Saweria QR Code](./assets/qr-saweria.png)](https://saweria.co/vnot01)
+
+**Jazakumullah Khairan** 🙏
+
+**Atau kunjungi:** [saweria.co/vnot01](https://saweria.co/vnot01)
+
+*Setiap donasi sangat berarti untuk pengembangan fitur-fitur baru!* 🙏
+
+</div>
+
+### 🔧 Alternative Donation Methods
+
+Jika QR code tidak muncul, Anda bisa:
+
+1. **Kunjungi langsung:** [saweria.co/vnot01](https://saweria.co/vnot01)
+2. **Scan QR code di halaman Saweria** - QR code akan muncul di halaman tersebut
+3. **Transfer langsung** - Gunakan fitur transfer di aplikasi Saweria
+
 
 ## 🙏 Acknowledgments
 

@@ -37,3 +37,5 @@ If applicable, add console logs from:
 1. Chrome DevTools Console
 2. Extension popup console
 3. Background script console
+
+
