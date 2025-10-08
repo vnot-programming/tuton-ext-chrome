@@ -21,14 +21,16 @@ git add .
 
 # Commit changes
 echo "💾 Committing changes..."
-git commit -m "Update: Chrome Extension with updated Chrome ID
+git commit -m "Update: Chrome Extension v1.0.0-alpha with QR Code Donation
 
-- Updated Chrome extension ID
-- Improved extension functionality
-- Enhanced security features
-- Updated API integration
+- Added CHANGELOG.md and RELEASE_NOTES.md for v1.0.0-alpha
+- Added QR code donation section with Saweria integration
+- Added 'Jazakumullah Khairan' message for donations
+- Updated .gitignore to exclude internal scripts
+- Enhanced documentation with comprehensive release notes
+- Added assets/qr-saweria.png for donation QR code
 
-Made with ❤️ for UT Tutor"
+Made with ❤️ for UT Toton"
 
 # Set main branch
 git branch -M main

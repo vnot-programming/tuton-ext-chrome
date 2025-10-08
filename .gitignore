@@ -71,3 +71,15 @@ build/
 INSTALLATION.md
 EXTENSION_CONFIG.md
 WEBSTORE_UPLOAD_GUIDE.md
+MANUAL_PUSH_INSTRUCTIONS.md
+
+# Setup scripts (internal use only)
+init-git.sh
+fix-git-config.sh
+check-user-and-setup.sh
+setup-vnot-programming.sh
+MANUAL_SETUP_VNOT_PROGRAMMING.md
+final-git-push.sh
+push-to-github.sh
+update-and-push.sh
+push-with-auth.sh
