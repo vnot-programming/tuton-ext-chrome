@@ -189,10 +189,16 @@ Jika QR code tidak muncul, Anda bisa:
 ## 📞 Support
 
 Jika mengalami masalah atau memiliki pertanyaan:
-1. Check [Issues](../../issues) untuk masalah yang sudah dilaporkan
-2. Buat [New Issue](../../issues/new) untuk masalah baru
+1. Check [Issues](https://github.com/vnot-programming/tuton-ext-chrome/issues) untuk masalah yang sudah dilaporkan
+2. Buat [New Issue](https://github.com/vnot-programming/tuton-ext-chrome/issues/new) untuk masalah baru
 3. Contact developer untuk support langsung
 
 ---
 
-**Made with ❤️ for UT Tutor** 🎓# tuton-ext-chrome
+**Made with ❤️ for UT Tuton** 🎓
+
+## 🔗 Links
+
+- **GitHub Repository**: [https://github.com/vnot-programming/tuton-ext-chrome](https://github.com/vnot-programming/tuton-ext-chrome)
+- **Chrome Web Store**: [Coming Soon]
+- **Support**: [GitHub Issues](https://github.com/vnot-programming/tuton-ext-chrome/issues)

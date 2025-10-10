@@ -28,22 +28,6 @@
 - **🐛 Debug Logging**: Added comprehensive console logging for troubleshooting
 - **⚡ Streamlined Processing**: Content extraction now focuses on student responses only
 
-## 🎓 UT E-Learning Text Grabber & AI Assistant v1.1
-
-**Release Date:** October 8, 2025  
-**Version:** 1.1  
-**Status:** Stable Release
-
----
-
-## 🚀 What's New in v1.1
-
-### 🔧 Bug Fixes & Improvements
-- **✅ Chrome Web Store Compliance**: Fixed policy violation by removing unused 'scripting' permission
-- **📋 Permission Audit**: Extension now only requests necessary permissions ('activeTab' and 'storage')
-- **🛡️ Enhanced Security**: Reduced attack surface by removing unnecessary permissions
-- **📚 Updated Documentation**: Accurate permission documentation and compliance information
-
 ### ✨ Core Features (from v1.0)
 - **🎯 Smart Text Extraction** - Automatically grabs text from UT e-learning forum discussions and course content
 - **🤖 Multi-AI Support** - Choose from Gemini 2.5 Flash, Gemini 2.5 Pro, Gemini 2.0 Flash, OpenAI GPT-4, or Claude 3.5 Sonnet
@@ -241,4 +225,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **🎓 Ready to enhance your UT e-learning experience? Install the extension today!**
 
-*For the latest updates and support, visit our [GitHub repository](https://github.com/your-username/tuton-ext-chrome).*
+*For the latest updates and support, visit our [GitHub repository](https://github.com/vnot-programming/tuton-ext-chrome).*
