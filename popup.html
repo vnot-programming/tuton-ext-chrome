@@ -4,23 +4,25 @@
   <meta charset="utf-8">
   <style>
     body {
-      width: 400px;
-      min-height: 500px;
+      width: 350px;
+      min-height: 400px;
+      max-height: 600px;
       margin: 0;
-      padding: 20px;
+      padding: 15px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
       color: white;
+      overflow-y: auto;
     }
     
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     
     .header h1 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
     }
     
@@ -66,7 +68,9 @@
     
     .tab-sheet-content {
       position: relative;
-      min-height: 300px;
+      min-height: 250px;
+      max-height: 450px;
+      overflow-y: auto;
     }
     
     .tab-sheet {
@@ -123,9 +127,9 @@
     
     .section {
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
       backdrop-filter: blur(10px);
     }
     
@@ -316,11 +320,11 @@
           <h3>📚 RAT (Rancangan Aktivitas Tutorial)</h3>
           <div style="margin-bottom: 15px;">
             <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.9); margin-bottom: 5px; font-weight: 600;">Deskripsi Singkat Mata Kuliah:</label>
-            <textarea id="deskripsiMataKuliah" placeholder="Masukkan deskripsi singkat mata kuliah dari RAT..." style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background: rgba(255, 255, 255, 0.95); color: #333; font-size: 12px; resize: vertical; box-sizing: border-box; font-family: inherit; outline: none; transition: border-color 0.3s ease;"></textarea>
+            <textarea id="deskripsiMataKuliah" placeholder="Masukkan deskripsi singkat mata kuliah dari RAT..." style="width: 100%; min-height: 60px; padding: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background: rgba(255, 255, 255, 0.95); color: #333; font-size: 12px; resize: vertical; box-sizing: border-box; font-family: inherit; outline: none; transition: border-color 0.3s ease;"></textarea>
           </div>
           <div style="margin-bottom: 15px;">
             <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.9); margin-bottom: 5px; font-weight: 600;">Capaian Pembelajaran Mata Kuliah:</label>
-            <textarea id="capaianPembelajaran" placeholder="Masukkan capaian pembelajaran mata kuliah dari RAT..." style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background: rgba(255, 255, 255, 0.95); color: #333; font-size: 12px; resize: vertical; box-sizing: border-box; font-family: inherit; outline: none; transition: border-color 0.3s ease;"></textarea>
+            <textarea id="capaianPembelajaran" placeholder="Masukkan capaian pembelajaran mata kuliah dari RAT..." style="width: 100%; min-height: 60px; padding: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background: rgba(255, 255, 255, 0.95); color: #333; font-size: 12px; resize: vertical; box-sizing: border-box; font-family: inherit; outline: none; transition: border-color 0.3s ease;"></textarea>
           </div>
           <div style="display: flex; gap: 10px; margin-bottom: 10px;">
             <button id="clearRAT" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: rgba(220, 20, 60, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease;">🗑️ Clear All</button>
