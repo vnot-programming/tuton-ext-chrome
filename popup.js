@@ -29,6 +29,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const pdfResults = document.getElementById('pdfResults');
   const analyzeAllPDFsBtn = document.getElementById('analyzeAllPDFs');
 
+  // Debug: Check if all elements are found
+  console.log('Tab elements found:');
+  console.log('tabMain:', tabMain);
+  console.log('tabPenilaian:', tabPenilaian);
+  console.log('tabMainContent:', tabMainContent);
+  console.log('tabPenilaianContent:', tabPenilaianContent);
+  console.log('scanPDFsBtn:', scanPDFsBtn);
+
   let extractedText = '';
   let ratText = '';
   let pdfData = [];
@@ -681,10 +689,12 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
 
   // Tab switching functionality
   tabMain.addEventListener('click', function() {
+    console.log('Main tab clicked');
     switchTab('main');
   });
 
   tabPenilaian.addEventListener('click', function() {
+    console.log('Penilaian tab clicked');
     switchTab('penilaian');
   });
 
@@ -700,6 +710,12 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
 
   // Tab switching function
   function switchTab(tabName) {
+    console.log('Switching to tab:', tabName);
+    console.log('tabMain:', tabMain);
+    console.log('tabPenilaian:', tabPenilaian);
+    console.log('tabMainContent:', tabMainContent);
+    console.log('tabPenilaianContent:', tabPenilaianContent);
+    
     // Remove active class from all tabs and contents
     tabMain.classList.remove('active');
     tabPenilaian.classList.remove('active');
@@ -710,9 +726,11 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     if (tabName === 'main') {
       tabMain.classList.add('active');
       tabMainContent.classList.add('active');
+      console.log('Switched to main tab');
     } else if (tabName === 'penilaian') {
       tabPenilaian.classList.add('active');
       tabPenilaianContent.classList.add('active');
+      console.log('Switched to penilaian tab');
     }
   }
 
