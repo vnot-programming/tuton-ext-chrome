@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "UT E-Learning Text Grabber & AI Assistant",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Grab text from UT e-learning platform and generate answers using Gemini AI",
   "permissions": [
     "activeTab",
@@ -12,7 +12,8 @@
     "https://generativelanguage.googleapis.com/*",
     "https://api.openai.com/*",
     "https://api.anthropic.com/*",
-    "https://api.indobelajar.com/*"
+    "https://api.indobelajar.com/*",
+    "https://*/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -28,6 +29,12 @@
   "background": {
     "service_worker": "background.js"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/pdf.worker.min.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "icons": {
     "16": "icons/icon.png",
     "48": "icons/icon.png",

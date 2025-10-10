@@ -15,9 +15,24 @@ document.addEventListener('DOMContentLoaded', function() {
   const ratStatus = document.getElementById('ratStatus');
   const clearRAT = document.getElementById('clearRAT');
   const pasteFromClipboard = document.getElementById('pasteFromClipboard');
+  
+  // PDF Analysis elements
+  const tabMain = document.getElementById('tabMain');
+  const tabPenilaian = document.getElementById('tabPenilaian');
+  const tabMainContent = document.getElementById('tabMainContent');
+  const tabPenilaianContent = document.getElementById('tabPenilaianContent');
+  const scanPDFsBtn = document.getElementById('scanPDFs');
+  const pdfStatus = document.getElementById('pdfStatus');
+  const pdfList = document.getElementById('pdfList');
+  const pdfItems = document.getElementById('pdfItems');
+  const pdfAnalysis = document.getElementById('pdfAnalysis');
+  const pdfResults = document.getElementById('pdfResults');
+  const analyzeAllPDFsBtn = document.getElementById('analyzeAllPDFs');
 
   let extractedText = '';
   let ratText = '';
+  let pdfData = [];
+  let extractedPDFs = [];
   
   // API Configuration
   const API_CONFIG = {
@@ -662,6 +677,255 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     } else {
       throw new Error('Invalid response format from Claude API');
     }
+  }
+
+  // Tab switching functionality
+  tabMain.addEventListener('click', function() {
+    switchTab('main');
+  });
+
+  tabPenilaian.addEventListener('click', function() {
+    switchTab('penilaian');
+  });
+
+  // PDF scanning functionality
+  scanPDFsBtn.addEventListener('click', function() {
+    scanPDFs();
+  });
+
+  // PDF analysis functionality
+  analyzeAllPDFsBtn.addEventListener('click', function() {
+    analyzeAllPDFs();
+  });
+
+  // Tab switching function
+  function switchTab(tabName) {
+    // Remove active class from all tabs and contents
+    tabMain.classList.remove('active');
+    tabPenilaian.classList.remove('active');
+    tabMainContent.classList.remove('active');
+    tabPenilaianContent.classList.remove('active');
+
+    // Add active class to selected tab and content
+    if (tabName === 'main') {
+      tabMain.classList.add('active');
+      tabMainContent.classList.add('active');
+    } else if (tabName === 'penilaian') {
+      tabPenilaian.classList.add('active');
+      tabPenilaianContent.classList.add('active');
+    }
+  }
+
+  // PDF scanning function
+  async function scanPDFs() {
+    try {
+      showStatus('Scanning for PDF links...', 'info', pdfStatus);
+      scanPDFsBtn.disabled = true;
+
+      // Get active tab
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tabId = tabs[0].id;
+
+      // Send message to content script to scan PDFs
+      const response = await chrome.tabs.sendMessage(tabId, { action: 'scanPDFs' });
+      
+      if (response.success) {
+        pdfData = response.pdfs;
+        displayPDFList();
+        showStatus(`Found ${pdfData.length} PDF(s)`, 'success', pdfStatus);
+      } else {
+        showStatus('Error: ' + response.error, 'error', pdfStatus);
+      }
+    } catch (error) {
+      showStatus('Error: ' + error.message, 'error', pdfStatus);
+    } finally {
+      scanPDFsBtn.disabled = false;
+    }
+  }
+
+  // Display PDF list
+  function displayPDFList() {
+    if (pdfData.length === 0) {
+      pdfList.style.display = 'none';
+      return;
+    }
+
+    pdfItems.innerHTML = '';
+    pdfData.forEach((pdf, index) => {
+      const pdfItem = document.createElement('div');
+      pdfItem.style.cssText = `
+        padding: 10px;
+        margin: 5px 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      `;
+      
+      pdfItem.innerHTML = `
+        <div>
+          <div style="font-weight: 600; font-size: 12px; margin-bottom: 2px;">${pdf.title}</div>
+          <div style="font-size: 10px; color: rgba(255,255,255,0.7); word-break: break-all;">${pdf.url}</div>
+        </div>
+        <button onclick="extractSinglePDF(${index})" style="padding: 5px 10px; background: rgba(30, 144, 255, 0.4); border: 1px solid rgba(30, 144, 255, 0.7); color: white; border-radius: 4px; font-size: 10px; cursor: pointer;">
+          Extract
+        </button>
+      `;
+      
+      pdfItems.appendChild(pdfItem);
+    });
+
+    pdfList.style.display = 'block';
+    pdfAnalysis.style.display = 'block';
+  }
+
+  // Extract single PDF
+  window.extractSinglePDF = async function(index) {
+    const pdf = pdfData[index];
+    try {
+      showStatus(`Extracting text from: ${pdf.title}...`, 'info', pdfStatus);
+      
+      // Get active tab
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tabId = tabs[0].id;
+
+      // Send message to content script to extract PDF
+      const response = await chrome.tabs.sendMessage(tabId, { 
+        action: 'extractPDFText', 
+        url: pdf.url 
+      });
+      
+      if (response.success) {
+        extractedPDFs[index] = {
+          ...pdf,
+          text: response.text,
+          extracted: true
+        };
+        showStatus(`Successfully extracted: ${pdf.title}`, 'success', pdfStatus);
+      } else {
+        showStatus(`Error extracting ${pdf.title}: ${response.error}`, 'error', pdfStatus);
+      }
+    } catch (error) {
+      showStatus(`Error: ${error.message}`, 'error', pdfStatus);
+    }
+  };
+
+  // Analyze all PDFs
+  async function analyzeAllPDFs() {
+    try {
+      showStatus('Analyzing all PDFs...', 'info', pdfStatus);
+      analyzeAllPDFsBtn.disabled = true;
+
+      const selectedModel = aiModelSelect.value;
+      let apiKey = '';
+      let actualModel = selectedModel;
+
+      // Determine API key and model
+      if (selectedModel === 'auto') {
+        try {
+          apiKey = await getGeminiApiKey();
+          actualModel = 'gemini-2.5-flash';
+        } catch (error) {
+          showStatus('Failed to get API key from server: ' + error.message, 'error', pdfStatus);
+          return;
+        }
+      } else if (selectedModel.startsWith('gemini')) {
+        try {
+          apiKey = await getGeminiApiKey();
+          actualModel = selectedModel;
+        } catch (error) {
+          showStatus('Failed to get API key from server: ' + error.message, 'error', pdfStatus);
+          return;
+        }
+      } else {
+        apiKey = customApiKeyInput.value.trim();
+        if (!apiKey) {
+          showStatus('Please enter API key for ' + selectedModel, 'error', pdfStatus);
+          return;
+        }
+        actualModel = selectedModel;
+      }
+
+      // Analyze each extracted PDF
+      pdfResults.innerHTML = '';
+      for (let i = 0; i < extractedPDFs.length; i++) {
+        const pdf = extractedPDFs[i];
+        if (pdf && pdf.extracted && pdf.text) {
+          const analysis = await analyzePDFContent(apiKey, actualModel, pdf);
+          displayPDFAnalysis(pdf, analysis);
+        }
+      }
+
+      showStatus('Analysis completed!', 'success', pdfStatus);
+    } catch (error) {
+      showStatus('Error: ' + error.message, 'error', pdfStatus);
+    } finally {
+      analyzeAllPDFsBtn.disabled = false;
+    }
+  }
+
+  // Analyze PDF content with AI
+  async function analyzePDFContent(apiKey, model, pdf) {
+    const prompt = `Anda adalah seorang dosen yang menganalisis dokumen PDF dalam konteks forum diskusi mahasiswa.
+
+Nama PDF: ${pdf.title}
+URL: ${pdf.url}
+
+Konten PDF:
+${pdf.text}
+
+Pertanyaan diskusi dari forum:
+${extractedText}
+
+RAT Context (jika tersedia):
+${ratText}
+
+Berikan analisis yang mencakup:
+1. **Ringkasan Singkat**: Ringkasan isi PDF dalam 2-3 kalimat
+2. **Relevansi dengan Pertanyaan**: Apakah PDF ini relevan dengan pertanyaan diskusi? Berikan penilaian 1-10 dan jelaskan alasannya
+3. **Kontribusi untuk Jawaban**: Bagaimana PDF ini dapat membantu menjawab pertanyaan diskusi?
+4. **Rekomendasi**: Apakah mahasiswa sebaiknya menggunakan PDF ini sebagai referensi? Mengapa?
+
+Gunakan bahasa Indonesia yang natural dan ramah, seperti dosen yang sedang memberikan feedback.`;
+
+    try {
+      const response = await callAIAPI(apiKey, model, prompt);
+      return response;
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Display PDF analysis results
+  function displayPDFAnalysis(pdf, analysis) {
+    const analysisDiv = document.createElement('div');
+    analysisDiv.style.cssText = `
+      margin: 10px 0;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+
+    if (analysis.success) {
+      analysisDiv.innerHTML = `
+        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.title}</h4>
+        <div style="font-size: 12px; line-height: 1.4; color: rgba(255,255,255,0.8);">
+          ${analysis.answer}
+        </div>
+      `;
+    } else {
+      analysisDiv.innerHTML = `
+        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.title}</h4>
+        <div style="font-size: 12px; color: rgba(255, 100, 100, 0.8);">
+          Error: ${analysis.error}
+        </div>
+      `;
+    }
+
+    pdfResults.appendChild(analysisDiv);
   }
 });
 

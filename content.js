@@ -13,6 +13,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep message channel open for async response
   }
   
+  // Handle PDF scanning request
+  if (request.action === 'scanPDFs') {
+    scanPDFLinks()
+      .then(pdfs => {
+        sendResponse({ success: true, pdfs: pdfs });
+      })
+      .catch(error => {
+        sendResponse({ success: false, error: error.message });
+      });
+    return true;
+  }
+  
+  // Handle PDF text extraction request
+  if (request.action === 'extractPDFText') {
+    extractPDFText(request.url)
+      .then(result => {
+        sendResponse(result);
+      })
+      .catch(error => {
+        sendResponse({ success: false, error: error.message });
+      });
+    return true;
+  }
 });
 
 // Function to grab text from the current page
@@ -241,5 +264,73 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', addExtensionIndicator);
 } else {
   addExtensionIndicator();
+}
+
+// PDF scanning and extraction functions
+async function scanPDFLinks() {
+  console.log('Scanning for PDF links...');
+  
+  // Find all PDF links on the page - UT e-learning specific patterns
+  const pdfLinks = document.querySelectorAll(`
+    a[href$=".pdf"], 
+    a[href*=".pdf"], 
+    a[href*="forcedownload=1"],
+    a[aria-label*=".pdf"],
+    a[href*="pluginfile.php"][href*="attachment"],
+    a[href*="pluginfile.php"][href*="mod_forum"]
+  `);
+  
+  const pdfs = [];
+  const processedUrls = new Set(); // To avoid duplicates
+  
+  pdfLinks.forEach((link, index) => {
+    const url = link.href;
+    const title = link.textContent.trim() || 
+                  link.getAttribute('aria-label') || 
+                  link.title || 
+                  `PDF ${index + 1}`;
+    
+    // Clean up title (remove extra whitespace, decode HTML entities)
+    const cleanTitle = title.replace(/\s+/g, ' ').trim();
+    
+    // Only add if URL contains PDF and not already processed
+    if ((url.includes('.pdf') || url.includes('forcedownload=1')) && !processedUrls.has(url)) {
+      processedUrls.add(url);
+      
+      pdfs.push({
+        url: url,
+        title: cleanTitle,
+        index: pdfs.length
+      });
+    }
+  });
+  
+  console.log(`Found ${pdfs.length} PDF links:`, pdfs);
+  return pdfs;
+}
+
+async function extractPDFText(url) {
+  console.log('Extracting text from PDF:', url);
+  
+  try {
+    // Send message to background script to extract PDF text
+    const response = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: 'EXTRACT_PDF_TEXT', url: url }, response => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        if (response.success) {
+          resolve(response);
+        } else {
+          reject(new Error(response.error));
+        }
+      });
+    });
+    
+    return response;
+  } catch (error) {
+    console.error('Error extracting PDF text:', error);
+    return { success: false, error: error.message };
+  }
 }
 
