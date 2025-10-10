@@ -735,6 +735,8 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
       console.log('Switched to penilaian sheet');
       console.log('penilaianSheet display:', window.getComputedStyle(penilaianSheet).display);
       
+      // Tab sheet switching successful
+      
       // Ensure text visibility in Penilaian Sheet
       const section = penilaianSheet.querySelector('.section');
       if (section) {
@@ -761,6 +763,27 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
         
         console.log('Penilaian section found and styled:', section);
         console.log('Section innerHTML length:', section.innerHTML.length);
+        
+        // Ensure text visibility in Penilaian Sheet
+        const h3 = section.querySelector('h3');
+        const p = section.querySelector('p');
+        const label = section.querySelector('label');
+        
+        if (h3) {
+          h3.style.color = 'white';
+          h3.style.fontSize = '16px';
+          h3.style.fontWeight = 'bold';
+        }
+        
+        if (p) {
+          p.style.color = 'white';
+          p.style.fontSize = '14px';
+        }
+        
+        if (label) {
+          label.style.color = 'white';
+          label.style.fontSize = '12px';
+        }
       } else {
         console.error('Section not found in penilaianSheet!');
         console.log('penilaianSheet innerHTML:', penilaianSheet.innerHTML);
