@@ -62,9 +62,7 @@ If you want to use other AI models (OpenAI, Claude):
 
 1. **Navigate to UT E-Learning**
    - Go to: https://elearning.ut.ac.id/login/index.php
-   - Use the provided credentials:
-     - Username: `04002183`
-     - Password: `f3riDR@GONLISTIO`
+   - Log in with your UT e-learning credentials
 
 2. **Test Auto Text Extraction**
    - Navigate to a forum discussion page
