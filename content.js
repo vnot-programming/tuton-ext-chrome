@@ -313,24 +313,69 @@ async function extractPDFText(url) {
   console.log('Extracting text from PDF:', url);
   
   try {
-    // Send message to background script to extract PDF text
-    const response = await new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ type: 'EXTRACT_PDF_TEXT', url: url }, response => {
-        if (chrome.runtime.lastError) {
-          return reject(chrome.runtime.lastError);
-        }
-        if (response.success) {
-          resolve(response);
-        } else {
-          reject(new Error(response.error));
-        }
-      });
-    });
+    // Load PDF.js library dynamically
+    if (!window.pdfjsLib) {
+      await loadPDFJS();
+    }
     
-    return response;
+    // Download PDF data using fetch
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+
+    // Load PDF using PDF.js
+    const pdf = await window.pdfjsLib.getDocument(arrayBuffer).promise;
+    console.log('PDF loaded, pages:', pdf.numPages);
+    
+    let fullText = '';
+    
+    // Iterate through each page to extract text
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+
+    console.log('PDF extraction successful.');
+    return { success: true, text: fullText, url: url };
+    
   } catch (error) {
     console.error('Error extracting PDF text:', error);
     return { success: false, error: error.message };
+  }
+}
+
+// Function to load PDF.js library
+async function loadPDFJS() {
+  if (window.pdfjsLib) return window.pdfjsLib;
+  
+  try {
+    // Fetch and execute PDF.js library
+    const response = await fetch(chrome.runtime.getURL('lib/pdf.min.js'));
+    const scriptText = await response.text();
+    
+    // Create a script element and execute it
+    const script = document.createElement('script');
+    script.textContent = scriptText;
+    document.head.appendChild(script);
+    
+    // Get the global pdfjsLib
+    window.pdfjsLib = window.pdfjsLib;
+    
+    if (!window.pdfjsLib) {
+      throw new Error('PDF.js library not loaded properly');
+    }
+    
+    // Set PDF.js worker path
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('lib/pdf.worker.min.js');
+    
+    return window.pdfjsLib;
+  } catch (error) {
+    console.error('Failed to load PDF.js library:', error);
+    throw error;
   }
 }
 

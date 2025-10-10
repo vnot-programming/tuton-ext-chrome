@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "UT E-Learning Text Grabber & AI Assistant",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Grab text from UT e-learning platform and generate answers using Gemini AI",
   "permissions": [
     "activeTab",
@@ -31,7 +31,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["lib/pdf.worker.min.js"],
+      "resources": ["lib/pdf.min.js", "lib/pdf.worker.min.js"],
       "matches": ["<all_urls>"]
     }
   ],
