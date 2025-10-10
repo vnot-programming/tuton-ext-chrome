@@ -205,6 +205,23 @@
   </div>
   
   <div class="section">
+    <h3>📚 RAT (Rancangan Aktivitas Tutorial)</h3>
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.9); margin-bottom: 5px; font-weight: 600;">Deskripsi Singkat Mata Kuliah:</label>
+      <textarea id="deskripsiMataKuliah" placeholder="Masukkan deskripsi singkat mata kuliah dari RAT..." style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background: rgba(255, 255, 255, 0.95); color: #333; font-size: 12px; resize: vertical; box-sizing: border-box; font-family: inherit; outline: none; transition: border-color 0.3s ease;"></textarea>
+    </div>
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.9); margin-bottom: 5px; font-weight: 600;">Capaian Pembelajaran Mata Kuliah:</label>
+      <textarea id="capaianPembelajaran" placeholder="Masukkan capaian pembelajaran mata kuliah dari RAT..." style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background: rgba(255, 255, 255, 0.95); color: #333; font-size: 12px; resize: vertical; box-sizing: border-box; font-family: inherit; outline: none; transition: border-color 0.3s ease;"></textarea>
+    </div>
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+      <button id="clearRAT" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: rgba(220, 20, 60, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease;">🗑️ Clear All</button>
+      <button id="pasteFromClipboard" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: rgba(30, 144, 255, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease;">📋 Paste</button>
+    </div>
+    <div id="ratStatus" class="status" style="display: none;"></div>
+  </div>
+  
+  <div class="section">
     <h3>📝 Extracted Text</h3>
     <div id="extractedText" class="extracted-text" style="display: none;"></div>
   </div>

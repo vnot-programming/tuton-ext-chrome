@@ -158,7 +158,7 @@
 ### 📞 Getting Help
 - **GitHub Issues** - Report bugs and request features
 - **Documentation** - Complete setup and usage guides
-- **Community** - Connect with other UT Toton
+- **Community** - Connect with other UT Tuton
 - **Developer** - Direct support from the development team
 
 ### 🐛 Known Issues
@@ -191,10 +191,10 @@
 - **Universitas Terbuka** - For the amazing e-learning platform
 - **Google Gemini AI** - For powerful AI capabilities
 - **Chrome Extension Team** - For excellent development tools
-- **UT Toton** - For feedback and testing
+- **UT Tuton** - For feedback and testing
 
 ### 💝 Made With Love
-This extension was created specifically for UT Toton to enhance their learning experience. Every feature is designed with UT's e-learning platform in mind.
+This extension was created specifically for UT Tuton to enhance their learning experience. Every feature is designed with UT's e-learning platform in mind.
 
 ---
 
@@ -207,7 +207,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Developer
 
 **Feri Febria Laksana**  
-*Made with ❤️ for UT Toton*
+*Made with ❤️ for UT Tuton*
 
 ---
 

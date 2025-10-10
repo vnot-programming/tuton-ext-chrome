@@ -133,7 +133,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Feri Febria Laksana**
-- Made with ❤️ for UT Toton
+- Made with ❤️ for UT Tuton
 
 ## 💝 Donate
 

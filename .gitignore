@@ -83,3 +83,4 @@ final-git-push.sh
 push-to-github.sh
 update-and-push.sh
 push-with-auth.sh
+build.sh

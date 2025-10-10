@@ -51,8 +51,25 @@ function extractForumDiscussionText() {
   let text = '';
   let processedPosts = new Set(); // To avoid duplicates
   
+  // Extract activity name (e.g., "Diskusi 1")
+  const activityNameElement = document.querySelector('h2.activity-name');
+  const activityName = activityNameElement ? activityNameElement.textContent.trim() : '';
+  
+  // Extract discussion materials (Bahan Diskusi) - keep for reference but don't add to output
+  const discussionMaterials = document.querySelector('.no-overflow p');
+  const materials = discussionMaterials ? discussionMaterials.textContent.trim() : '';
+  
+  // Add activity context to the beginning
+  if (activityName) {
+    text += `=== AKTIVITAS: ${activityName} ===\n\n`;
+  }
+  
+  // Don't add materials to text output - we only want student responses
+  
   // Get all forum posts (including main post and replies)
-  const forumPosts = document.querySelectorAll('.forumpost, [data-content="forum-post"], .forum-post-container');
+  const forumPosts = document.querySelectorAll('.forum-post-container, .forumpost, [data-content="forum-post"]');
+  
+  console.log('Found forum posts:', forumPosts.length);
   
   if (forumPosts.length > 0) {
     let postIndex = 1;
@@ -74,16 +91,39 @@ function extractForumDiscussionText() {
       }
       
       // Get the post content - this is the main part we want
-      const postContent = post.querySelector('.post-content-container, [id^="post-content-"]');
+      const postContent = post.querySelector('[id^="post-content-"]');
+      console.log('Post content found:', !!postContent, postContent?.id);
+      
       if (postContent) {
-        text += postContent.innerText.trim() + '\n\n';
-        postIndex++;
+        const postText = postContent.innerText.trim();
+        console.log('Post text length:', postText.length);
+        console.log('Post text preview:', postText.substring(0, 100));
+        
+        // Check if this post content is the same as discussion materials to avoid duplication
+        if (!materials || !postText.includes(materials.substring(0, 100))) {
+          text += postText + '\n\n';
+          postIndex++;
+        } else {
+          console.log('Skipping duplicate content');
+        }
+        // Skip posts that are the same as discussion materials
       } else {
         // Fallback: get any content within the post
-        const fallbackContent = post.querySelector('.content, .post-content, .body-content-container');
+        const fallbackContent = post.querySelector('.post-content-container, .content, .post-content, .body-content-container');
+        console.log('Fallback content found:', !!fallbackContent);
+        
         if (fallbackContent) {
-          text += fallbackContent.innerText.trim() + '\n\n';
-          postIndex++;
+          const fallbackText = fallbackContent.innerText.trim();
+          console.log('Fallback text length:', fallbackText.length);
+          
+          // Check if this content is the same as discussion materials
+          if (!materials || !fallbackText.includes(materials.substring(0, 100))) {
+            text += fallbackText + '\n\n';
+            postIndex++;
+          } else {
+            console.log('Skipping duplicate fallback content');
+          }
+          // Skip posts that are the same as discussion materials
         }
       }
     });

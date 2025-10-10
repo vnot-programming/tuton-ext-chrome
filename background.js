@@ -27,12 +27,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
   
-  if (request.action === 'openLoginPage') {
-    chrome.tabs.create({
-      url: 'https://elearning.ut.ac.id/login/index.php'
-    });
-    sendResponse({ success: true });
-  }
 });
 
 // Handle tab updates to inject content script when needed

@@ -114,7 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Response Caching** - Cache frequently requested responses
 - **Smart Summarization** - Automatic content summarization
 - **Citation Tracking** - Track sources and references
-- **Collaborative Features** - Share responses with other Toton
+- **Collaborative Features** - Share responses with other Tuton
 - **Integration APIs** - Connect with other educational tools
 - **Mobile Support** - Extension for mobile browsers
 - **Accessibility** - Enhanced accessibility features
@@ -138,4 +138,4 @@ For support, bug reports, or feature requests, please visit our [GitHub Issues](
 
 ---
 
-**Made with ❤️ for UT Toton** 🎓
+**Made with ❤️ for UT Tuton** 🎓

@@ -10,15 +10,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const aiResponseDiv = document.getElementById('aiResponse');
   const aiResponseContainer = document.getElementById('aiResponseContainer');
   const copyResponseBtn = document.getElementById('copyResponse');
+  const deskripsiMataKuliah = document.getElementById('deskripsiMataKuliah');
+  const capaianPembelajaran = document.getElementById('capaianPembelajaran');
+  const ratStatus = document.getElementById('ratStatus');
+  const clearRAT = document.getElementById('clearRAT');
+  const pasteFromClipboard = document.getElementById('pasteFromClipboard');
 
   let extractedText = '';
+  let ratText = '';
   
   // API Configuration
   const API_CONFIG = {
     baseUrl: 'https://api.indobelajar.com',
     apiKey: 'my-secure-secret-key-2024',        // Sama dengan di server
     secretKey: 'my-secure-secret-key-2024',     // Sama dengan di server
-    extensionId: 'kkimaokajhpnijhkfmilcagehocjncpl'  // Extension ID Chrome Anda
+    extensionId: 'jdbphidcaelegicljgoeceikcgeadpnl'  // Extension ID Chrome Anda
   };
 
   // Generate HMAC signature
@@ -80,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Load saved settings
-  chrome.storage.sync.get(['selectedModel', 'customApiKey'], function(result) {
+  chrome.storage.sync.get(['selectedModel', 'customApiKey', 'deskripsiMataKuliah', 'capaianPembelajaran'], function(result) {
     if (result.selectedModel) {
       aiModelSelect.value = result.selectedModel;
     } else {
@@ -89,7 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (result.customApiKey) {
       customApiKeyInput.value = result.customApiKey;
     }
+    if (result.deskripsiMataKuliah) {
+      deskripsiMataKuliah.value = result.deskripsiMataKuliah;
+    }
+    if (result.capaianPembelajaran) {
+      capaianPembelajaran.value = result.capaianPembelajaran;
+    }
     updateApiKeySection();
+    updateRATContent(); // Update RAT content after loading
   });
   
   // Auto extract text when popup opens
@@ -105,6 +118,99 @@ document.addEventListener('DOMContentLoaded', function() {
   customApiKeyInput.addEventListener('input', function() {
     chrome.storage.sync.set({ customApiKey: customApiKeyInput.value });
   });
+  
+  // Handle RAT input changes
+  deskripsiMataKuliah.addEventListener('input', updateRATContent);
+  capaianPembelajaran.addEventListener('input', updateRATContent);
+  
+  // Handle paste events
+  deskripsiMataKuliah.addEventListener('paste', function(e) {
+    setTimeout(updateRATContent, 10); // Small delay to ensure paste is complete
+  });
+  capaianPembelajaran.addEventListener('paste', function(e) {
+    setTimeout(updateRATContent, 10); // Small delay to ensure paste is complete
+  });
+  
+  // Add focus/blur styling
+  deskripsiMataKuliah.addEventListener('focus', function() {
+    this.style.borderColor = 'rgba(46, 139, 87, 0.7)';
+  });
+  deskripsiMataKuliah.addEventListener('blur', function() {
+    this.style.borderColor = 'rgba(255,255,255,0.3)';
+  });
+  
+  capaianPembelajaran.addEventListener('focus', function() {
+    this.style.borderColor = 'rgba(46, 139, 87, 0.7)';
+  });
+  capaianPembelajaran.addEventListener('blur', function() {
+    this.style.borderColor = 'rgba(255,255,255,0.3)';
+  });
+  
+  // Handle clear button
+  clearRAT.addEventListener('click', function() {
+    deskripsiMataKuliah.value = '';
+    capaianPembelajaran.value = '';
+    updateRATContent();
+    showStatus('RAT content cleared!', 'info', ratStatus);
+  });
+  
+  // Handle paste from clipboard button
+  pasteFromClipboard.addEventListener('click', async function() {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      if (clipboardText) {
+        // Try to detect which field to paste to based on content
+        if (clipboardText.toLowerCase().includes('deskripsi') || clipboardText.toLowerCase().includes('mata kuliah')) {
+          deskripsiMataKuliah.value = clipboardText;
+        } else if (clipboardText.toLowerCase().includes('capaian') || clipboardText.toLowerCase().includes('pembelajaran')) {
+          capaianPembelajaran.value = clipboardText;
+        } else {
+          // If unclear, paste to the first empty field
+          if (!deskripsiMataKuliah.value.trim()) {
+            deskripsiMataKuliah.value = clipboardText;
+          } else if (!capaianPembelajaran.value.trim()) {
+            capaianPembelajaran.value = clipboardText;
+          } else {
+            // Both fields have content, ask user to choose
+            showStatus('Both fields have content. Please paste manually to the desired field.', 'info', ratStatus);
+            return;
+          }
+        }
+        updateRATContent();
+        showStatus('Content pasted successfully!', 'success', ratStatus);
+      } else {
+        showStatus('No content in clipboard', 'info', ratStatus);
+      }
+    } catch (error) {
+      showStatus('Cannot access clipboard. Please paste manually (Ctrl+V)', 'error', ratStatus);
+    }
+  });
+  
+  function updateRATContent() {
+    const deskripsi = deskripsiMataKuliah.value.trim();
+    const capaian = capaianPembelajaran.value.trim();
+    
+    // Save to storage
+    chrome.storage.sync.set({
+      deskripsiMataKuliah: deskripsi,
+      capaianPembelajaran: capaian
+    });
+    
+    if (deskripsi || capaian) {
+      ratText = '';
+      if (deskripsi) {
+        ratText += '=== DESKRIPSI SINGKAT MATA KULIAH ===\n' + deskripsi + '\n\n';
+      }
+      if (capaian) {
+        ratText += '=== CAPAIAN PEMBELAJARAN MATA KULIAH ===\n' + capaian + '\n\n';
+      }
+      showStatus('RAT content updated!', 'success', ratStatus);
+    } else {
+      ratText = '';
+      showStatus('RAT content cleared', 'info', ratStatus);
+    }
+  }
+
   
   
   // Function to update API key section visibility
@@ -243,25 +349,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   // Helper function to show status messages
-  function showStatus(message, type) {
-    apiStatus.textContent = message;
-    apiStatus.className = 'status ' + type;
-    apiStatus.style.display = 'block';
+  function showStatus(message, type, targetElement = apiStatus) {
+    targetElement.textContent = message;
+    targetElement.className = 'status ' + type;
+    targetElement.style.display = 'block';
     
     setTimeout(() => {
-      apiStatus.style.display = 'none';
+      targetElement.style.display = 'none';
     }, 3000);
   }
 
   // Function to call AI API based on selected model
   async function callAIAPI(apiKey, model, text) {
-    const prompt = `Anda adalah seorang dosen atau tutor yang membantu mahasiswa di forum diskusi UT. 
+    let prompt = `Anda adalah seorang dosen atau tutor yang membantu mahasiswa di forum diskusi UT. 
 
 Teks berikut adalah postingan dari mahasiswa di forum:
 
-${text}
+${text}`;
 
-Berikan respons yang:
+    // Add RAT context if available
+    if (ratText) {
+      prompt += `\n\n=== RANCANGAN AKTIVITAS TUTORIAL (RAT) ===\n${ratText}`;
+    }
+
+    prompt += `\n\nBerikan respons yang:
 1. Natural dan seperti ditulis manusia, bukan AI
 2. Menggunakan bahasa Indonesia yang sederhana dan mudah dipahami
 3. Ramah dan mendukung, seperti teman yang membantu
@@ -272,6 +383,12 @@ Berikan respons yang:
 8. Fokus pada isi postingan dan berikan saran yang relevan
 9. Gunakan paragraf yang mengalir natural
 10. Berikan tips praktis jika relevan
+11. JANGAN menyebutkan atau menjelaskan tentang "Deskripsi Singkat Mata Kuliah" atau "Capaian Pembelajaran" dari RAT
+12. Jika jawaban sudah sesuai dengan topik, tanggapi secara natural tanpa menjelaskan kesesuaiannya
+13. Komentari apakah jawaban memiliki referensi yang memadai
+14. Periksa apakah ada contoh implementasi dalam jawaban
+15. Berikan feedback konstruktif untuk meningkatkan kualitas jawaban
+16. Di akhir, berikan semangat kepada mahasiswa tanpa membuat summary atau kesimpulan
 
 Tulis respons seperti teman yang sedang membantu di forum:`;
 
