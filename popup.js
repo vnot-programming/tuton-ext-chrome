@@ -21,13 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const tabPenilaian = document.getElementById('tabPenilaian');
   const tabMainContent = document.getElementById('tabMainContent');
   const tabPenilaianContent = document.getElementById('tabPenilaianContent');
-  const scanPDFsBtn = document.getElementById('scanPDFs');
+  const pdfUpload = document.getElementById('pdfUpload');
   const pdfStatus = document.getElementById('pdfStatus');
-  const pdfList = document.getElementById('pdfList');
-  const pdfItems = document.getElementById('pdfItems');
+  const pdfInfo = document.getElementById('pdfInfo');
+  const pdfFileName = document.getElementById('pdfFileName');
+  const pdfFileSize = document.getElementById('pdfFileSize');
   const pdfAnalysis = document.getElementById('pdfAnalysis');
   const pdfResults = document.getElementById('pdfResults');
-  const analyzeAllPDFsBtn = document.getElementById('analyzeAllPDFs');
+  const analyzePDFBtn = document.getElementById('analyzePDF');
 
   // Debug: Check if all elements are found
   console.log('Tab elements found:');
@@ -35,12 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('tabPenilaian:', tabPenilaian);
   console.log('tabMainContent:', tabMainContent);
   console.log('tabPenilaianContent:', tabPenilaianContent);
-  console.log('scanPDFsBtn:', scanPDFsBtn);
+  console.log('pdfUpload:', pdfUpload);
 
   let extractedText = '';
   let ratText = '';
-  let pdfData = [];
-  let extractedPDFs = [];
+  let uploadedPDF = null;
   
   // API Configuration
   const API_CONFIG = {
@@ -698,14 +698,14 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     switchTab('penilaian');
   });
 
-  // PDF scanning functionality
-  scanPDFsBtn.addEventListener('click', function() {
-    scanPDFs();
+  // PDF upload functionality
+  pdfUpload.addEventListener('change', function(event) {
+    handlePDFUpload(event);
   });
 
   // PDF analysis functionality
-  analyzeAllPDFsBtn.addEventListener('click', function() {
-    analyzeAllPDFs();
+  analyzePDFBtn.addEventListener('click', function() {
+    analyzeUploadedPDF();
   });
 
   // Tab switching function
@@ -734,107 +734,119 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     }
   }
 
-  // PDF scanning function
-  async function scanPDFs() {
+  // PDF upload handling function
+  async function handlePDFUpload(event) {
+    const file = event.target.files[0];
+    
+    if (!file) {
+      return;
+    }
+    
+    if (file.type !== 'application/pdf') {
+      showStatus('Please select a PDF file', 'error', pdfStatus);
+      return;
+    }
+    
     try {
-      showStatus('Scanning for PDF links...', 'info', pdfStatus);
-      scanPDFsBtn.disabled = true;
-
-      // Get active tab
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      const tabId = tabs[0].id;
-
-      // Send message to content script to scan PDFs
-      const response = await chrome.tabs.sendMessage(tabId, { action: 'scanPDFs' });
+      showStatus('Processing PDF file...', 'info', pdfStatus);
       
-      if (response.success) {
-        pdfData = response.pdfs;
-        displayPDFList();
-        showStatus(`Found ${pdfData.length} PDF(s)`, 'success', pdfStatus);
-      } else {
-        showStatus('Error: ' + response.error, 'error', pdfStatus);
-      }
+      // Store file info
+      uploadedPDF = {
+        file: file,
+        name: file.name,
+        size: file.size,
+        text: null
+      };
+      
+      // Display file info
+      displayPDFInfo();
+      
+      // Extract text from PDF
+      const text = await extractTextFromPDF(file);
+      uploadedPDF.text = text;
+      
+      showStatus('PDF processed successfully!', 'success', pdfStatus);
+      pdfAnalysis.style.display = 'block';
+      
     } catch (error) {
-      showStatus('Error: ' + error.message, 'error', pdfStatus);
-    } finally {
-      scanPDFsBtn.disabled = false;
+      console.error('Error processing PDF:', error);
+      showStatus('Error processing PDF: ' + error.message, 'error', pdfStatus);
     }
   }
 
-  // Display PDF list
-  function displayPDFList() {
-    if (pdfData.length === 0) {
-      pdfList.style.display = 'none';
+  // Display PDF info
+  function displayPDFInfo() {
+    if (!uploadedPDF) {
+      pdfInfo.style.display = 'none';
       return;
     }
 
-    pdfItems.innerHTML = '';
-    pdfData.forEach((pdf, index) => {
-      const pdfItem = document.createElement('div');
-      pdfItem.style.cssText = `
-        padding: 10px;
-        margin: 5px 0;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      `;
-      
-      pdfItem.innerHTML = `
-        <div>
-          <div style="font-weight: 600; font-size: 12px; margin-bottom: 2px;">${pdf.title}</div>
-          <div style="font-size: 10px; color: rgba(255,255,255,0.7); word-break: break-all;">${pdf.url}</div>
-        </div>
-        <button onclick="extractSinglePDF(${index})" style="padding: 5px 10px; background: rgba(30, 144, 255, 0.4); border: 1px solid rgba(30, 144, 255, 0.7); color: white; border-radius: 4px; font-size: 10px; cursor: pointer;">
-          Extract
-        </button>
-      `;
-      
-      pdfItems.appendChild(pdfItem);
-    });
-
-    pdfList.style.display = 'block';
-    pdfAnalysis.style.display = 'block';
+    pdfFileName.textContent = uploadedPDF.name;
+    pdfFileSize.textContent = `Size: ${formatFileSize(uploadedPDF.size)}`;
+    pdfInfo.style.display = 'block';
   }
 
-  // Extract single PDF
-  window.extractSinglePDF = async function(index) {
-    const pdf = pdfData[index];
-    try {
-      showStatus(`Extracting text from: ${pdf.title}...`, 'info', pdfStatus);
-      
-      // Get active tab
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      const tabId = tabs[0].id;
+  // Format file size
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
 
-      // Send message to content script to extract PDF
-      const response = await chrome.tabs.sendMessage(tabId, { 
-        action: 'extractPDFText', 
-        url: pdf.url 
-      });
+  // Extract text from uploaded PDF
+  async function extractTextFromPDF(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
       
-      if (response.success) {
-        extractedPDFs[index] = {
-          ...pdf,
-          text: response.text,
-          extracted: true
-        };
-        showStatus(`Successfully extracted: ${pdf.title}`, 'success', pdfStatus);
-      } else {
-        showStatus(`Error extracting ${pdf.title}: ${response.error}`, 'error', pdfStatus);
-      }
-    } catch (error) {
-      showStatus(`Error: ${error.message}`, 'error', pdfStatus);
+      reader.onload = async function(e) {
+        try {
+          const arrayBuffer = e.target.result;
+          
+          // Load PDF.js library if not already loaded
+          if (!window.pdfjsLib) {
+            await loadPDFJS();
+          }
+          
+          // Load PDF using PDF.js
+          const pdf = await window.pdfjsLib.getDocument(arrayBuffer).promise;
+          console.log('PDF loaded, pages:', pdf.numPages);
+          
+          let fullText = '';
+          
+          // Iterate through each page to extract text
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + '\n';
+          }
+          
+          resolve(fullText);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      
+      reader.onerror = function() {
+        reject(new Error('Failed to read PDF file'));
+      };
+      
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  // Analyze uploaded PDF
+  async function analyzeUploadedPDF() {
+    if (!uploadedPDF || !uploadedPDF.text) {
+      showStatus('Please upload a PDF file first', 'error', pdfStatus);
+      return;
     }
-  };
 
-  // Analyze all PDFs
-  async function analyzeAllPDFs() {
     try {
-      showStatus('Analyzing all PDFs...', 'info', pdfStatus);
-      analyzeAllPDFsBtn.disabled = true;
+      showStatus('Analyzing PDF...', 'info', pdfStatus);
+      analyzePDFBtn.disabled = true;
 
       const selectedModel = aiModelSelect.value;
       let apiKey = '';
@@ -866,21 +878,16 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
         actualModel = selectedModel;
       }
 
-      // Analyze each extracted PDF
+      // Analyze the uploaded PDF
       pdfResults.innerHTML = '';
-      for (let i = 0; i < extractedPDFs.length; i++) {
-        const pdf = extractedPDFs[i];
-        if (pdf && pdf.extracted && pdf.text) {
-          const analysis = await analyzePDFContent(apiKey, actualModel, pdf);
-          displayPDFAnalysis(pdf, analysis);
-        }
-      }
+      const analysis = await analyzePDFContent(apiKey, actualModel, uploadedPDF);
+      displayPDFAnalysis(uploadedPDF, analysis);
 
       showStatus('Analysis completed!', 'success', pdfStatus);
     } catch (error) {
       showStatus('Error: ' + error.message, 'error', pdfStatus);
     } finally {
-      analyzeAllPDFsBtn.disabled = false;
+      analyzePDFBtn.disabled = false;
     }
   }
 
@@ -888,8 +895,7 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
   async function analyzePDFContent(apiKey, model, pdf) {
     const prompt = `Anda adalah seorang dosen yang menganalisis dokumen PDF dalam konteks forum diskusi mahasiswa.
 
-Nama PDF: ${pdf.title}
-URL: ${pdf.url}
+Nama PDF: ${pdf.name}
 
 Konten PDF:
 ${pdf.text}
@@ -929,14 +935,14 @@ Gunakan bahasa Indonesia yang natural dan ramah, seperti dosen yang sedang membe
 
     if (analysis.success) {
       analysisDiv.innerHTML = `
-        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.title}</h4>
+        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.name}</h4>
         <div style="font-size: 12px; line-height: 1.4; color: rgba(255,255,255,0.8);">
           ${analysis.answer}
         </div>
       `;
     } else {
       analysisDiv.innerHTML = `
-        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.title}</h4>
+        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.name}</h4>
         <div style="font-size: 12px; color: rgba(255, 100, 100, 0.8);">
           Error: ${analysis.error}
         </div>

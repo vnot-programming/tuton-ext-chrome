@@ -292,26 +292,33 @@
     <div class="section">
       <h3>📊 Analisis PDF & Penilaian</h3>
       <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 15px;">
-        Analisis PDF yang ditemukan di halaman forum dan evaluasi relevansinya dengan pertanyaan diskusi.
+        Upload PDF yang telah didownload dari diskusi mahasiswa untuk dianalisis relevansinya dengan pertanyaan diskusi.
       </p>
       
       <div style="margin-bottom: 15px;">
-        <button id="scanPDFs" style="width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(30, 144, 255, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease; margin-bottom: 10px;">
-          🔍 Scan PDF Links
-        </button>
+        <div style="position: relative; margin-bottom: 15px;">
+          <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
+          <label for="pdfUpload" style="display: block; width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 12px;">
+            📁 <strong>Click untuk Upload PDF</strong><br>
+            <span style="font-size: 10px; color: rgba(255,255,255,0.6);">Drag & drop atau click untuk memilih file PDF</span>
+          </label>
+        </div>
         <div id="pdfStatus" class="status" style="display: none;"></div>
       </div>
       
-      <div id="pdfList" style="display: none;">
-        <h4 style="font-size: 14px; margin-bottom: 10px; color: rgba(255,255,255,0.9);">📄 PDF Ditemukan:</h4>
-        <div id="pdfItems"></div>
+      <div id="pdfInfo" style="display: none; margin-bottom: 15px;">
+        <div style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);">
+          <h4 style="font-size: 14px; margin: 0 0 8px 0; color: rgba(255,255,255,0.9);">📄 File PDF:</h4>
+          <div id="pdfFileName" style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 5px;"></div>
+          <div id="pdfFileSize" style="font-size: 10px; color: rgba(255,255,255,0.6);"></div>
+        </div>
       </div>
       
       <div id="pdfAnalysis" style="display: none;">
         <h4 style="font-size: 14px; margin-bottom: 10px; color: rgba(255,255,255,0.9);">🤖 Analisis AI:</h4>
         <div id="pdfResults"></div>
-        <button id="analyzeAllPDFs" style="width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(46, 139, 87, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;">
-          🚀 Analisis Semua PDF
+        <button id="analyzePDF" style="width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(46, 139, 87, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;">
+          🚀 Analisis PDF
         </button>
       </div>
     </div>
