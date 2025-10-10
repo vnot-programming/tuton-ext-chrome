@@ -688,25 +688,45 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
   }
 
   // Tab switching functionality
-  tabMain.addEventListener('click', function() {
-    console.log('Main tab clicked');
-    switchTab('main');
-  });
+  if (tabMain) {
+    tabMain.addEventListener('click', function() {
+      console.log('Main tab clicked');
+      switchTab('main');
+    });
+    console.log('Main tab event listener attached');
+  } else {
+    console.error('tabMain element not found!');
+  }
 
-  tabPenilaian.addEventListener('click', function() {
-    console.log('Penilaian tab clicked');
-    switchTab('penilaian');
-  });
+  if (tabPenilaian) {
+    tabPenilaian.addEventListener('click', function() {
+      console.log('Penilaian tab clicked');
+      switchTab('penilaian');
+    });
+    console.log('Penilaian tab event listener attached');
+  } else {
+    console.error('tabPenilaian element not found!');
+  }
 
   // PDF upload functionality
-  pdfUpload.addEventListener('change', function(event) {
-    handlePDFUpload(event);
-  });
+  if (pdfUpload) {
+    pdfUpload.addEventListener('change', function(event) {
+      handlePDFUpload(event);
+    });
+    console.log('PDF upload event listener attached');
+  } else {
+    console.error('pdfUpload element not found!');
+  }
 
   // PDF analysis functionality
-  analyzePDFBtn.addEventListener('click', function() {
-    analyzeUploadedPDF();
-  });
+  if (analyzePDFBtn) {
+    analyzePDFBtn.addEventListener('click', function() {
+      analyzeUploadedPDF();
+    });
+    console.log('PDF analysis event listener attached');
+  } else {
+    console.error('analyzePDFBtn element not found!');
+  }
 
   // Tab switching function
   function switchTab(tabName) {
@@ -715,6 +735,12 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     console.log('tabPenilaian:', tabPenilaian);
     console.log('tabMainContent:', tabMainContent);
     console.log('tabPenilaianContent:', tabPenilaianContent);
+    
+    // Check if elements exist
+    if (!tabMain || !tabPenilaian || !tabMainContent || !tabPenilaianContent) {
+      console.error('Tab elements not found!');
+      return;
+    }
     
     // Remove active class from all tabs and contents
     tabMain.classList.remove('active');
@@ -727,10 +753,13 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
       tabMain.classList.add('active');
       tabMainContent.classList.add('active');
       console.log('Switched to main tab');
+      console.log('tabMainContent classes:', tabMainContent.className);
     } else if (tabName === 'penilaian') {
       tabPenilaian.classList.add('active');
       tabPenilaianContent.classList.add('active');
       console.log('Switched to penilaian tab');
+      console.log('tabPenilaianContent classes:', tabPenilaianContent.className);
+      console.log('tabPenilaianContent display:', window.getComputedStyle(tabPenilaianContent).display);
     }
   }
 
