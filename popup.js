@@ -30,13 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const pdfResults = document.getElementById('pdfResults');
   const analyzePDFBtn = document.getElementById('analyzePDF');
 
-  // Debug: Check if all elements are found
-  console.log('Tab elements found:');
-  console.log('tabMain:', tabMain);
-  console.log('tabPenilaian:', tabPenilaian);
-  console.log('tabMainContent:', tabMainContent);
-  console.log('tabPenilaianContent:', tabPenilaianContent);
-  console.log('pdfUpload:', pdfUpload);
+  // Tab elements initialized
 
   let extractedText = '';
   let ratText = '';
@@ -690,22 +684,14 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
   // Tab switching functionality
   if (tabMain) {
     tabMain.addEventListener('click', function() {
-      console.log('Main tab clicked');
       switchTab('main');
     });
-    console.log('Main tab event listener attached');
-  } else {
-    console.error('tabMain element not found!');
   }
 
   if (tabPenilaian) {
     tabPenilaian.addEventListener('click', function() {
-      console.log('Penilaian tab clicked');
       switchTab('penilaian');
     });
-    console.log('Penilaian tab event listener attached');
-  } else {
-    console.error('tabPenilaian element not found!');
   }
 
   // PDF upload functionality
@@ -713,9 +699,6 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     pdfUpload.addEventListener('change', function(event) {
       handlePDFUpload(event);
     });
-    console.log('PDF upload event listener attached');
-  } else {
-    console.error('pdfUpload element not found!');
   }
 
   // PDF analysis functionality
@@ -723,22 +706,12 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     analyzePDFBtn.addEventListener('click', function() {
       analyzeUploadedPDF();
     });
-    console.log('PDF analysis event listener attached');
-  } else {
-    console.error('analyzePDFBtn element not found!');
   }
 
   // Tab switching function
   function switchTab(tabName) {
-    console.log('Switching to tab:', tabName);
-    console.log('tabMain:', tabMain);
-    console.log('tabPenilaian:', tabPenilaian);
-    console.log('tabMainContent:', tabMainContent);
-    console.log('tabPenilaianContent:', tabPenilaianContent);
-    
     // Check if elements exist
     if (!tabMain || !tabPenilaian || !tabMainContent || !tabPenilaianContent) {
-      console.error('Tab elements not found!');
       return;
     }
     
@@ -752,74 +725,33 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     if (tabName === 'main') {
       tabMain.classList.add('active');
       tabMainContent.classList.add('active');
-      console.log('Switched to main tab');
-      console.log('tabMainContent classes:', tabMainContent.className);
     } else if (tabName === 'penilaian') {
       tabPenilaian.classList.add('active');
       tabPenilaianContent.classList.add('active');
-      console.log('Switched to penilaian tab');
-      console.log('tabPenilaianContent classes:', tabPenilaianContent.className);
-      console.log('tabPenilaianContent display:', window.getComputedStyle(tabPenilaianContent).display);
       
-      // Visual debugging - add temporary border to see if content is there
-      tabPenilaianContent.style.border = '2px solid red';
-      tabPenilaianContent.style.minHeight = '200px';
-      tabPenilaianContent.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
-      console.log('Added visual debugging to tabPenilaianContent');
-      
-      // Check if content exists
+      // Ensure text visibility in Tab Penilaian
       const section = tabPenilaianContent.querySelector('.section');
-      console.log('Section element:', section);
       if (section) {
-        console.log('Section innerHTML length:', section.innerHTML.length);
-        console.log('Section text content:', section.textContent.substring(0, 100));
-        console.log('Section display:', window.getComputedStyle(section).display);
-        console.log('Section visibility:', window.getComputedStyle(section).visibility);
-        console.log('Section opacity:', window.getComputedStyle(section).opacity);
-        section.style.border = '2px solid blue';
-        section.style.backgroundColor = 'rgba(0, 0, 255, 0.1)';
-      } else {
-        console.error('Section element not found inside tabPenilaianContent!');
-      }
-      
-      // Check all child elements
-      const children = tabPenilaianContent.children;
-      console.log('tabPenilaianContent children count:', children.length);
-      for (let i = 0; i < children.length; i++) {
-        console.log(`Child ${i}:`, children[i].tagName, children[i].className);
-      }
-      
-      // Check text elements specifically
-      const h3 = section.querySelector('h3');
-      const p = section.querySelector('p');
-      const label = section.querySelector('label');
-      
-      if (h3) {
-        console.log('H3 element:', h3);
-        console.log('H3 text:', h3.textContent);
-        console.log('H3 color:', window.getComputedStyle(h3).color);
-        console.log('H3 display:', window.getComputedStyle(h3).display);
-        h3.style.color = 'white';
-        h3.style.fontSize = '16px';
-        h3.style.fontWeight = 'bold';
-      }
-      
-      if (p) {
-        console.log('P element:', p);
-        console.log('P text:', p.textContent);
-        console.log('P color:', window.getComputedStyle(p).color);
-        console.log('P display:', window.getComputedStyle(p).display);
-        p.style.color = 'white';
-        p.style.fontSize = '14px';
-      }
-      
-      if (label) {
-        console.log('Label element:', label);
-        console.log('Label text:', label.textContent);
-        console.log('Label color:', window.getComputedStyle(label).color);
-        console.log('Label display:', window.getComputedStyle(label).display);
-        label.style.color = 'white';
-        label.style.fontSize = '12px';
+        // Apply text visibility fixes
+        const h3 = section.querySelector('h3');
+        const p = section.querySelector('p');
+        const label = section.querySelector('label');
+        
+        if (h3) {
+          h3.style.color = 'white';
+          h3.style.fontSize = '16px';
+          h3.style.fontWeight = 'bold';
+        }
+        
+        if (p) {
+          p.style.color = 'white';
+          p.style.fontSize = '14px';
+        }
+        
+        if (label) {
+          label.style.color = 'white';
+          label.style.fontSize = '12px';
+        }
       }
     }
   }
