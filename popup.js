@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const clearRAT = document.getElementById('clearRAT');
   const pasteFromClipboard = document.getElementById('pasteFromClipboard');
   
-  // PDF Analysis elements
+  // Tab Sheet elements
   const tabMain = document.getElementById('tabMain');
   const tabPenilaian = document.getElementById('tabPenilaian');
-  const tabMainContent = document.getElementById('tabMainContent');
-  const tabPenilaianContent = document.getElementById('tabPenilaianContent');
+  const mainSheet = document.getElementById('mainSheet');
+  const penilaianSheet = document.getElementById('penilaianSheet');
   const pdfUpload = document.getElementById('pdfUpload');
   const pdfStatus = document.getElementById('pdfStatus');
   const pdfInfo = document.getElementById('pdfInfo');
@@ -681,16 +681,16 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     }
   }
 
-  // Tab switching functionality
+  // Tab Sheet switching functionality
   if (tabMain) {
     tabMain.addEventListener('click', function() {
-      switchTab('main');
+      switchTabSheet('main');
     });
   }
 
   if (tabPenilaian) {
     tabPenilaian.addEventListener('click', function() {
-      switchTab('penilaian');
+      switchTabSheet('penilaian');
     });
   }
 
@@ -708,29 +708,35 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     });
   }
 
-  // Tab switching function
-  function switchTab(tabName) {
+  // Tab Sheet switching function
+  function switchTabSheet(tabName) {
+    console.log('Switching to tab sheet:', tabName);
+    
     // Check if elements exist
-    if (!tabMain || !tabPenilaian || !tabMainContent || !tabPenilaianContent) {
+    if (!tabMain || !tabPenilaian || !mainSheet || !penilaianSheet) {
+      console.error('Tab sheet elements not found!');
       return;
     }
     
-    // Remove active class from all tabs and contents
+    // Remove active class from all tabs and sheets
     tabMain.classList.remove('active');
     tabPenilaian.classList.remove('active');
-    tabMainContent.classList.remove('active');
-    tabPenilaianContent.classList.remove('active');
+    mainSheet.classList.remove('active');
+    penilaianSheet.classList.remove('active');
 
-    // Add active class to selected tab and content
+    // Add active class to selected tab and sheet
     if (tabName === 'main') {
       tabMain.classList.add('active');
-      tabMainContent.classList.add('active');
+      mainSheet.classList.add('active');
+      console.log('Switched to main sheet');
     } else if (tabName === 'penilaian') {
       tabPenilaian.classList.add('active');
-      tabPenilaianContent.classList.add('active');
+      penilaianSheet.classList.add('active');
+      console.log('Switched to penilaian sheet');
+      console.log('penilaianSheet display:', window.getComputedStyle(penilaianSheet).display);
       
-      // Ensure text visibility in Tab Penilaian
-      const section = tabPenilaianContent.querySelector('.section');
+      // Ensure text visibility in Penilaian Sheet
+      const section = penilaianSheet.querySelector('.section');
       if (section) {
         // Apply text visibility fixes
         const h3 = section.querySelector('h3');
@@ -752,6 +758,12 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
           label.style.color = 'white';
           label.style.fontSize = '12px';
         }
+        
+        console.log('Penilaian section found and styled:', section);
+        console.log('Section innerHTML length:', section.innerHTML.length);
+      } else {
+        console.error('Section not found in penilaianSheet!');
+        console.log('penilaianSheet innerHTML:', penilaianSheet.innerHTML);
       }
     }
   }

@@ -24,42 +24,64 @@
       font-weight: 600;
     }
     
-    .tab-container {
-      display: flex;
-      gap: 5px;
-      margin-top: 10px;
+    /* Tab Sheet Styles */
+    .tab-sheet-container {
+      width: 100%;
+      margin-bottom: 15px;
     }
     
-    .tab-button {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 6px;
+    .tab-sheet-nav {
+      display: flex;
+      gap: 2px;
       background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.7);
+      border-radius: 8px;
+      padding: 3px;
+      margin-bottom: 15px;
+    }
+    
+    .tab-sheet-button {
+      flex: 1;
+      padding: 10px 15px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      border-radius: 6px;
+      cursor: pointer;
       font-size: 12px;
       font-weight: 500;
-      cursor: pointer;
       transition: all 0.3s ease;
+      position: relative;
     }
     
-    .tab-button:hover {
+    .tab-sheet-button:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .tab-sheet-button.active {
       background: rgba(255, 255, 255, 0.2);
       color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
     
-    .tab-button.active {
-      background: rgba(255, 255, 255, 0.3);
-      color: white;
-      border-color: rgba(255, 255, 255, 0.5);
+    .tab-sheet-content {
+      position: relative;
+      min-height: 300px;
     }
     
-    .tab-content {
-      display: none !important;
+    .tab-sheet {
+      display: none;
+      width: 100%;
+      animation: fadeIn 0.3s ease-in-out;
     }
     
-    .tab-content.active {
-      display: block !important;
+    .tab-sheet.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     /* Fallback untuk memastikan konten terlihat */
@@ -245,14 +267,19 @@
 <body>
   <div class="header">
     <h1>🎓 UT E-Learning Assistant</h1>
-    <div class="tab-container">
-      <button id="tabMain" class="tab-button active">📝 Main</button>
-      <button id="tabPenilaian" class="tab-button">📊 Penilaian</button>
-    </div>
   </div>
   
-  <!-- Tab Main Content -->
-  <div id="tabMainContent" class="tab-content active">
+  <!-- Tab Sheet Navigation -->
+  <div class="tab-sheet-container">
+    <div class="tab-sheet-nav">
+      <button id="tabMain" class="tab-sheet-button active" data-tab="main">📝 Main</button>
+      <button id="tabPenilaian" class="tab-sheet-button" data-tab="penilaian">📊 Penilaian</button>
+    </div>
+    
+    <!-- Tab Sheet Content -->
+    <div class="tab-sheet-content">
+      <!-- Main Tab Sheet -->
+      <div id="mainSheet" class="tab-sheet active">
     <div class="section">
       <h3>🔑 AI Model Selection</h3>
     <select id="aiModel" class="api-key-input" style="margin-bottom: 10px;">
@@ -308,41 +335,43 @@
       </div>
       <div id="aiResponse" class="ai-response"></div>
     </div>
-  </div>
-  
-  <!-- Tab Penilaian Content -->
-  <div id="tabPenilaianContent" class="tab-content">
-    <div class="section">
-      <h3>📊 Analisis PDF & Penilaian</h3>
-      <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 15px;">
-        Upload PDF yang telah didownload dari diskusi mahasiswa untuk dianalisis relevansinya dengan pertanyaan diskusi.
-      </p>
-      
-      <div style="margin-bottom: 15px;">
-        <div style="position: relative; margin-bottom: 15px;">
-          <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
-          <label for="pdfUpload" style="display: block; width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 12px;">
-            📁 <strong>Click untuk Upload PDF</strong><br>
-            <span style="font-size: 10px; color: rgba(255,255,255,0.6);">Drag & drop atau click untuk memilih file PDF</span>
-          </label>
-        </div>
-        <div id="pdfStatus" class="status" style="display: none;"></div>
       </div>
       
-      <div id="pdfInfo" style="display: none; margin-bottom: 15px;">
-        <div style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);">
-          <h4 style="font-size: 14px; margin: 0 0 8px 0; color: rgba(255,255,255,0.9);">📄 File PDF:</h4>
-          <div id="pdfFileName" style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 5px;"></div>
-          <div id="pdfFileSize" style="font-size: 10px; color: rgba(255,255,255,0.6);"></div>
+      <!-- Penilaian Tab Sheet -->
+      <div id="penilaianSheet" class="tab-sheet">
+        <div class="section">
+          <h3>📊 Analisis PDF & Penilaian</h3>
+          <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 15px;">
+            Upload PDF yang telah didownload dari diskusi mahasiswa untuk dianalisis relevansinya dengan pertanyaan diskusi.
+          </p>
+          
+          <div style="margin-bottom: 15px;">
+            <div style="position: relative; margin-bottom: 15px;">
+              <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
+              <label for="pdfUpload" style="display: block; width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 12px;">
+                📁 <strong>Click untuk Upload PDF</strong><br>
+                <span style="font-size: 10px; color: rgba(255,255,255,0.6);">Drag & drop atau click untuk memilih file PDF</span>
+              </label>
+            </div>
+            <div id="pdfStatus" class="status" style="display: none;"></div>
+          </div>
+          
+          <div id="pdfInfo" style="display: none; margin-bottom: 15px;">
+            <div style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);">
+              <h4 style="font-size: 14px; margin: 0 0 8px 0; color: rgba(255,255,255,0.9);">📄 File PDF:</h4>
+              <div id="pdfFileName" style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 5px;"></div>
+              <div id="pdfFileSize" style="font-size: 10px; color: rgba(255,255,255,0.6);"></div>
+            </div>
+          </div>
+          
+          <div id="pdfAnalysis" style="display: none;">
+            <h4 style="font-size: 14px; margin-bottom: 10px; color: rgba(255,255,255,0.9);">🤖 Analisis AI:</h4>
+            <div id="pdfResults"></div>
+            <button id="analyzePDF" style="width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(46, 139, 87, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;">
+              🚀 Analisis PDF
+            </button>
+          </div>
         </div>
-      </div>
-      
-      <div id="pdfAnalysis" style="display: none;">
-        <h4 style="font-size: 14px; margin-bottom: 10px; color: rgba(255,255,255,0.9);">🤖 Analisis AI:</h4>
-        <div id="pdfResults"></div>
-        <button id="analyzePDF" style="width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(46, 139, 87, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;">
-          🚀 Analisis PDF
-        </button>
       </div>
     </div>
   </div>
