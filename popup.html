@@ -55,11 +55,34 @@
     }
     
     .tab-content {
-      display: none;
+      display: none !important;
     }
     
     .tab-content.active {
-      display: block;
+      display: block !important;
+    }
+    
+    /* Fallback untuk memastikan konten terlihat */
+    #tabPenilaianContent {
+      min-height: 200px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Force text visibility in Tab Penilaian */
+    #tabPenilaianContent .section {
+      color: white !important;
+    }
+    
+    #tabPenilaianContent .section h3 {
+      color: white !important;
+    }
+    
+    #tabPenilaianContent .section p {
+      color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    #tabPenilaianContent .section label {
+      color: rgba(255, 255, 255, 0.8) !important;
     }
     
     .section {

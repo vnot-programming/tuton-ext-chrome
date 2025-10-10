@@ -760,6 +760,67 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
       console.log('Switched to penilaian tab');
       console.log('tabPenilaianContent classes:', tabPenilaianContent.className);
       console.log('tabPenilaianContent display:', window.getComputedStyle(tabPenilaianContent).display);
+      
+      // Visual debugging - add temporary border to see if content is there
+      tabPenilaianContent.style.border = '2px solid red';
+      tabPenilaianContent.style.minHeight = '200px';
+      tabPenilaianContent.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+      console.log('Added visual debugging to tabPenilaianContent');
+      
+      // Check if content exists
+      const section = tabPenilaianContent.querySelector('.section');
+      console.log('Section element:', section);
+      if (section) {
+        console.log('Section innerHTML length:', section.innerHTML.length);
+        console.log('Section text content:', section.textContent.substring(0, 100));
+        console.log('Section display:', window.getComputedStyle(section).display);
+        console.log('Section visibility:', window.getComputedStyle(section).visibility);
+        console.log('Section opacity:', window.getComputedStyle(section).opacity);
+        section.style.border = '2px solid blue';
+        section.style.backgroundColor = 'rgba(0, 0, 255, 0.1)';
+      } else {
+        console.error('Section element not found inside tabPenilaianContent!');
+      }
+      
+      // Check all child elements
+      const children = tabPenilaianContent.children;
+      console.log('tabPenilaianContent children count:', children.length);
+      for (let i = 0; i < children.length; i++) {
+        console.log(`Child ${i}:`, children[i].tagName, children[i].className);
+      }
+      
+      // Check text elements specifically
+      const h3 = section.querySelector('h3');
+      const p = section.querySelector('p');
+      const label = section.querySelector('label');
+      
+      if (h3) {
+        console.log('H3 element:', h3);
+        console.log('H3 text:', h3.textContent);
+        console.log('H3 color:', window.getComputedStyle(h3).color);
+        console.log('H3 display:', window.getComputedStyle(h3).display);
+        h3.style.color = 'white';
+        h3.style.fontSize = '16px';
+        h3.style.fontWeight = 'bold';
+      }
+      
+      if (p) {
+        console.log('P element:', p);
+        console.log('P text:', p.textContent);
+        console.log('P color:', window.getComputedStyle(p).color);
+        console.log('P display:', window.getComputedStyle(p).display);
+        p.style.color = 'white';
+        p.style.fontSize = '14px';
+      }
+      
+      if (label) {
+        console.log('Label element:', label);
+        console.log('Label text:', label.textContent);
+        console.log('Label color:', window.getComputedStyle(label).color);
+        console.log('Label display:', window.getComputedStyle(label).display);
+        label.style.color = 'white';
+        label.style.fontSize = '12px';
+      }
     }
   }
 
