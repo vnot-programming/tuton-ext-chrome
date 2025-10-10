@@ -84,3 +84,4 @@ push-to-github.sh
 update-and-push.sh
 push-with-auth.sh
 build.sh
+EXTENSION_CONFIG.md
