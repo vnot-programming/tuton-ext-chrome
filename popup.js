@@ -385,10 +385,15 @@ ${text}`;
 10. Berikan tips praktis jika relevan
 11. JANGAN menyebutkan atau menjelaskan tentang "Deskripsi Singkat Mata Kuliah" atau "Capaian Pembelajaran" dari RAT
 12. Jika jawaban sudah sesuai dengan topik, tanggapi secara natural tanpa menjelaskan kesesuaiannya
-13. Komentari apakah jawaban memiliki referensi yang memadai
-14. Periksa apakah ada contoh implementasi dalam jawaban
-15. Berikan feedback konstruktif untuk meningkatkan kualitas jawaban
-16. Di akhir, berikan semangat kepada mahasiswa tanpa membuat summary atau kesimpulan
+13. EVALUASI REFERENSI AKADEMIK: Periksa apakah jawaban mahasiswa menyertakan referensi yang proper seperti:
+    - Sumber bacaan (buku, jurnal, artikel ilmiah)
+    - Format sitasi yang benar (penulis, judul, tahun, penerbit)
+    - Contoh: "Menurut Smith (2020) dalam bukunya 'Algoritma Modern'..."
+    - Atau: "Berdasarkan penelitian Johnson et al. (2019) yang diterbitkan di Journal of Computer Science..."
+14. EVALUASI CONTOH IMPLEMENTASI: Periksa apakah ada contoh praktis atau implementasi nyata
+15. Berikan saran untuk menambahkan referensi jika jawaban tidak memilikinya
+16. Berikan feedback konstruktif untuk meningkatkan kualitas akademik jawaban
+17. Di akhir, berikan semangat kepada mahasiswa tanpa membuat summary atau kesimpulan
 
 Tulis respons seperti teman yang sedang membantu di forum:`;
 

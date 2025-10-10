@@ -59,6 +59,9 @@ function extractForumDiscussionText() {
   const discussionMaterials = document.querySelector('.no-overflow p');
   const materials = discussionMaterials ? discussionMaterials.textContent.trim() : '';
   
+  console.log('Discussion materials found:', !!materials);
+  console.log('Materials preview:', materials ? materials.substring(0, 100) : 'None');
+  
   // Add activity context to the beginning
   if (activityName) {
     text += `=== AKTIVITAS: ${activityName} ===\n\n`;
@@ -99,14 +102,11 @@ function extractForumDiscussionText() {
         console.log('Post text length:', postText.length);
         console.log('Post text preview:', postText.substring(0, 100));
         
-        // Check if this post content is the same as discussion materials to avoid duplication
-        if (!materials || !postText.includes(materials.substring(0, 100))) {
+        // Always add post content - let AI handle the analysis
+        if (postText.length > 0) {
           text += postText + '\n\n';
           postIndex++;
-        } else {
-          console.log('Skipping duplicate content');
         }
-        // Skip posts that are the same as discussion materials
       } else {
         // Fallback: get any content within the post
         const fallbackContent = post.querySelector('.post-content-container, .content, .post-content, .body-content-container');
@@ -116,14 +116,11 @@ function extractForumDiscussionText() {
           const fallbackText = fallbackContent.innerText.trim();
           console.log('Fallback text length:', fallbackText.length);
           
-          // Check if this content is the same as discussion materials
-          if (!materials || !fallbackText.includes(materials.substring(0, 100))) {
+          // Always add fallback content if it exists
+          if (fallbackText.length > 0) {
             text += fallbackText + '\n\n';
             postIndex++;
-          } else {
-            console.log('Skipping duplicate fallback content');
           }
-          // Skip posts that are the same as discussion materials
         }
       }
     });
