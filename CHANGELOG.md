@@ -5,6 +5,41 @@ All notable changes to the UT E-Learning Text Grabber & AI Assistant Chrome Exte
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-10-10
+
+### Added
+- **RAT Integration**: Added RAT (Rancangan Aktivitas Tutorial) input fields for course description and learning outcomes
+- **Academic Reference Evaluation**: AI now evaluates student responses for proper academic references and citations
+- **Enhanced Text Extraction**: Improved forum post extraction with better content detection
+- **Smart Duplication Prevention**: Prevents duplicate content extraction between discussion materials and student posts
+- **Debug Logging**: Added comprehensive console logging for troubleshooting
+
+### Fixed
+- **Text Extraction Issues**: Fixed problem where only post headers were extracted without content
+- **Content Security Policy**: Resolved CSP violations by removing external PDF.js dependency
+- **File Exclusion**: Properly excluded internal scripts from build zip and repository
+- **Duplicate Content**: Eliminated duplicate text extraction between materials and posts
+
+### Changed
+- **UI Enhancement**: Replaced file upload with text input fields for better usability
+- **AI Prompt**: Updated AI evaluation to focus on academic references and implementation examples
+- **Build Process**: Improved build script to exclude development files
+- **Content Processing**: Streamlined text extraction to focus on student responses only
+
+### Security
+- **No External Dependencies**: Removed external script dependencies to avoid CSP issues
+- **Clean Repository**: Excluded internal scripts from version control
+- **Build Security**: Only essential extension files included in distribution
+
+## [1.2.0] - 2025-10-09
+
+### Added
+- **PDF Support**: Added PDF text extraction capability for RAT documents
+- **RAT Context**: AI now uses RAT information as context for evaluation
+
+### Fixed
+- **Content Security Policy**: Resolved CSP violations with external scripts
+
 ## [1.1] - 2025-10-08
 
 ### Fixed

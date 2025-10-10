@@ -5,8 +5,11 @@ Chrome extension untuk membantu mahasiswa Universitas Terbuka dalam forum diskus
 ## ✨ Features
 
 - **Auto Text Extraction**: Otomatis mengekstrak teks dari forum UT e-learning
+- **RAT Integration**: Input fields untuk Deskripsi Singkat Mata Kuliah dan Capaian Pembelajaran
+- **Academic Reference Evaluation**: AI mengevaluasi referensi akademik dan sitasi yang proper
 - **Multi-Model AI Support**: Mendukung Gemini, OpenAI GPT, dan Claude
 - **Secure API Integration**: Menggunakan server API yang aman untuk menyimpan API keys
+- **Smart Duplication Prevention**: Mencegah duplikasi konten antara bahan diskusi dan jawaban mahasiswa
 - **Modern UI**: Interface yang modern dan user-friendly
 - **Copy Function**: Mudah copy response AI ke clipboard
 
@@ -27,9 +30,19 @@ Extension tersedia di Chrome Web Store: [Link akan ditambahkan setelah publish]
 1. **Buka halaman UT e-learning** (`https://elearning.ut.ac.id/`)
 2. **Click icon extension** di toolbar Chrome
 3. **Extension akan otomatis extract text** dari halaman
-4. **Pilih AI model** yang diinginkan
-5. **Click "Generate Answer with AI"**
-6. **Copy response** jika diperlukan
+4. **Input RAT (Opsional)**: Masukkan Deskripsi Singkat Mata Kuliah dan Capaian Pembelajaran
+5. **Pilih AI model** yang diinginkan
+6. **Click "Generate Answer with AI"**
+7. **Copy response** jika diperlukan
+
+## 📚 RAT Integration
+
+Extension mendukung integrasi dengan RAT (Rancangan Aktivitas Tutorial):
+
+- **Deskripsi Singkat Mata Kuliah**: Input field untuk deskripsi mata kuliah dari RAT
+- **Capaian Pembelajaran Mata Kuliah**: Input field untuk capaian pembelajaran dari RAT
+- **AI Context**: AI akan menggunakan informasi RAT sebagai konteks untuk evaluasi
+- **Academic Evaluation**: AI mengevaluasi jawaban mahasiswa berdasarkan RAT dan referensi akademik
 
 ## 🤖 Supported AI Models
 

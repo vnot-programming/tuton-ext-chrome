@@ -1,5 +1,33 @@
 # Release Notes
 
+## 🎓 UT E-Learning Text Grabber & AI Assistant v1.3.0
+
+**Release Date:** October 10, 2025  
+**Version:** 1.3.0  
+**Status:** Stable Release
+
+---
+
+## 🚀 What's New in v1.3.0
+
+### 🆕 Major New Features
+- **📚 RAT Integration**: Added input fields for RAT (Rancangan Aktivitas Tutorial) course description and learning outcomes
+- **🎓 Academic Reference Evaluation**: AI now evaluates student responses for proper academic references and citations
+- **🔍 Enhanced Text Extraction**: Improved forum post extraction with better content detection
+- **🚫 Smart Duplication Prevention**: Prevents duplicate content extraction between discussion materials and student posts
+
+### 🔧 Bug Fixes & Improvements
+- **✅ Text Extraction Fixed**: Resolved issue where only post headers were extracted without content
+- **🛡️ Content Security Policy**: Fixed CSP violations by removing external PDF.js dependency
+- **📁 File Management**: Properly excluded internal scripts from build zip and repository
+- **🔄 Duplicate Content**: Eliminated duplicate text extraction between materials and posts
+
+### 🎨 UI/UX Improvements
+- **📝 Text Input Fields**: Replaced file upload with user-friendly text input fields
+- **🎯 Focused Evaluation**: AI now focuses on academic references and implementation examples
+- **🐛 Debug Logging**: Added comprehensive console logging for troubleshooting
+- **⚡ Streamlined Processing**: Content extraction now focuses on student responses only
+
 ## 🎓 UT E-Learning Text Grabber & AI Assistant v1.1
 
 **Release Date:** October 8, 2025  
