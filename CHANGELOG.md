@@ -5,7 +5,7 @@ All notable changes to the UT E-Learning Text Grabber & AI Assistant Chrome Exte
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0] - 2026-04-24
+## [1.7.0] - 2026-04-24
 
 ### Added
 - **Native OpenRouter API Integration**: Sistem cerdas yang secara otomatis mendeteksi format model `provider/model` dan merutekannya ke OpenRouter API lengkap dengan headers yang dibutuhkan.
@@ -176,7 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 1.4.0 | 2026-04-24 | Native OpenRouter Support, Multi-Tier Dropdown, 4-Layer Anti-CoT Engine, and Extensive New Models |
+| 1.7.0 | 2026-04-24 | Native OpenRouter Support, Multi-Tier Dropdown, 4-Layer Anti-CoT Engine, and Extensive New Models |
 | 1.1 | 2025-10-08 | Fixed Chrome Web Store compliance and permission issues |
 | 1.0.0-alpha | 2025-10-08 | Initial alpha release with core functionality |
 

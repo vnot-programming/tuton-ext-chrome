@@ -1,14 +1,14 @@
 # Release Notes
 
-## 🎓 UT E-Learning Text Grabber & AI Assistant v1.4.0
+## 🎓 UT E-Learning Text Grabber & AI Assistant v1.7.0
 
 **Release Date:** April 24, 2026  
-**Version:** 1.4.0  
+**Version:** 1.7.0  
 **Status:** Stable Release
 
 ---
 
-## 🚀 What's New in v1.4.0
+## 🚀 What's New in v1.7.0
 
 ### 🆕 Major New Features
 - **🌐 OpenRouter Native Integration**: Seamless auto-routing capabilities for any `provider/model` formatted string.

@@ -140,7 +140,7 @@ Extension menggunakan secure API server di `https://api.indobelajar.com/` semata
 
 ## 📝 Changelog
 
-### Version 1.4.0 (April 2026)
+### Version 1.7.0 (April 2026)
 - **New Feature**: Native OpenRouter API Integration dengan *auto-routing*.
 - **New Feature**: 4-Layer Aggressive Anti-CoT Engine untuk memfilter "kebocoran pikiran" AI.
 - **Enhancement**: Dukungan puluhan model baru (Gemini 3.1, GPT-5.4, Claude 4.5/4.6, DeepSeek-R1/V3, Llama 4, dll).
