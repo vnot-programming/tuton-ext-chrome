@@ -7,11 +7,14 @@ Chrome extension untuk membantu mahasiswa Universitas Terbuka dalam forum diskus
 - **Auto Text Extraction**: Otomatis mengekstrak teks dari forum UT e-learning
 - **RAT Integration**: Input fields untuk Deskripsi Singkat Mata Kuliah dan Capaian Pembelajaran
 - **Academic Reference Evaluation**: AI mengevaluasi referensi akademik dan sitasi yang proper
-- **Multi-Model AI Support**: Mendukung Gemini, OpenAI GPT, dan Claude
-- **Secure API Integration**: Menggunakan server API yang aman untuk menyimpan API keys
-- **Smart Duplication Prevention**: Mencegah duplikasi konten antara bahan diskusi dan jawaban mahasiswa
-- **Modern UI**: Interface yang modern dan user-friendly
-- **Copy Function**: Mudah copy response AI ke clipboard
+- **Multi-Provider AI Support**: Mendukung Google (Gemini), OpenAI (GPT), Anthropic (Claude), dan OpenRouter (DeepSeek, Llama, Qwen, dll).
+- **Smart API Routing**: Integrasi native dengan OpenRouter. Hanya dengan memasukkan nama model (misal: `provider/model`), API akan otomatis diarahkan.
+- **Aggressive Anti-CoT Engine**: Dilengkapi 4 lapis filter ekstraksi cerdas (XML, Regex, Fallback) untuk memastikan model *open-weights* tidak membocorkan *Chain-of-Thought* (draf mental) ke antarmuka pengguna.
+- **Human-Readable Error Handling**: Pesan error yang informatif jika terjadi kegagalan API (401, 404, 429).
+- **100% Privacy & Local Storage**: API Key pribadi milik End User hanya disimpan di memori *browser* lokal dan dikirim langsung ke penyedia AI. Kami tidak menyimpan atau menyadap API Key Anda.
+- **Smart Duplication Prevention**: Mencegah duplikasi konten antara bahan diskusi dan jawaban mahasiswa.
+- **Modern UI**: Interface yang modern dan user-friendly.
+- **Copy Function**: Mudah copy response AI ke clipboard.
 
 ## 🔧 Installation
 
@@ -44,22 +47,40 @@ Extension mendukung integrasi dengan RAT (Rancangan Aktivitas Tutorial):
 - **AI Context**: AI akan menggunakan informasi RAT sebagai konteks untuk evaluasi
 - **Academic Evaluation**: AI mengevaluasi jawaban mahasiswa berdasarkan RAT dan referensi akademik
 
-## 🤖 Supported AI Models
+## 🤖 Supported AI Models & Providers
 
-- **Auto (Recommended)**: Balance antara kualitas dan kecepatan
-- **Gemini 2.5 Flash**: Latest dan fastest
-- **Gemini 2.5 Pro**: Highest quality
-- **Gemini 2.0 Flash**: Stable version
-- **OpenAI GPT-4**: Untuk custom API key
-- **Claude 3.5 Sonnet**: Untuk custom API key
+Ekstensi kini mendukung banyak AI Provider dan puluhan model terbaru yang dipisahkan berdasarkan kategori:
 
-## 🔐 Security
+### Google DeepMind
+- **Auto (Gemini 3.1 Flash Lite)**: Direkomendasikan
+- **Gemini 3.1 Flash**
+- **Gemini 3.1 Pro**
 
-- ✅ **API keys tersimpan aman** di server `https://api.indobelajar.com/`
-- ✅ **HMAC signature verification** untuk autentikasi
-- ✅ **Rate limiting** untuk mencegah abuse
-- ✅ **CORS protection**
-- ✅ **No embedded API keys** di extension
+### OpenAI
+- **GPT-4o & GPT-4o Mini**
+- **GPT-5.4 Series**: GPT-5.4, Mini, Pro
+- **GPT-OSS-120B** (via OpenRouter)
+
+### Anthropic
+- **Claude 4.6 Opus**
+- **Claude 4.5 Sonnet & Haiku**
+
+### Others (via OpenRouter & Direct)
+- **DeepSeek**: DeepSeek-R1, DeepSeek-V3
+- **Meta**: Llama 3.3, Llama 4 (Maverick)
+- **Alibaba**: Qwen 3.5
+- **Mistral**: Mistral Large 3
+- **Zhipu / 01.AI / MiniMax**: GLM-5, GLM 4.5 Air, Ling-2.6-flash, MiniMax M2.5
+
+*Sistem dilengkapi fitur **Smart Routing**, di mana model yang memiliki karakter `/` (slash) akan secara otomatis diteruskan ke OpenRouter tanpa perlu konfigurasi tambahan.*
+
+## 🔐 Security & Privacy (100% Aman)
+
+Privasi dan keamanan kredensial Anda adalah prioritas mutlak kami.
+- ✅ **Zero Server Storage**: API Key pribadi yang diisikan oleh End User **sama sekali tidak dikirim atau disimpan ke server mana pun** (termasuk `api.indobelajar.com`). API Key Anda tetap aman, eksklusif berada di *browser* Anda (Local/Sync Storage).
+- ✅ **Direct API Connection**: Saat Anda men-generate jawaban, API Key Anda dikirimkan secara langsung dari browser Anda ke Endpoint resmi penyedia AI (Google, OpenAI, Anthropic, OpenRouter).
+- ✅ **Server Indobelajar Hanya Untuk Fallback**: Ekstensi menggunakan server `api.indobelajar.com` secara eksklusif dan aman (menggunakan algoritma *HMAC signature verification*) semata-mata untuk mengambil "API Key Publik Gratis" milik developer jika Anda memilih tidak memasukkan API Key pribadi.
+- ✅ **Rate Limiting & CORS Protection** untuk mencegah eksploitasi pada jalur komunikasi.
 
 ## 📁 Project Structure
 
@@ -108,15 +129,23 @@ Extension memerlukan permission berikut:
 
 ## 🔄 API Integration
 
-Extension menggunakan secure API server di `https://api.indobelajar.com/` untuk:
-- Menyimpan Gemini API key dengan aman
-- Autentikasi dengan HMAC signature
-- Rate limiting dan monitoring
+Extension menggunakan secure API server di `https://api.indobelajar.com/` semata-mata untuk:
+- Menyediakan *fallback API Key* milik developer untuk pengguna secara aman.
+- Autentikasi koneksi dengan HMAC signature.
+- Rate limiting dan monitoring penggunaan server.
+*(Catatan: API Key milik Anda sendiri tidak pernah dikirim ke server ini)*
 
 ### API Endpoints
 - `GET /api/key`: Mendapatkan Gemini API key dengan autentikasi
 
 ## 📝 Changelog
+
+### Version 1.4.0 (April 2026)
+- **New Feature**: Native OpenRouter API Integration dengan *auto-routing*.
+- **New Feature**: 4-Layer Aggressive Anti-CoT Engine untuk memfilter "kebocoran pikiran" AI.
+- **Enhancement**: Dukungan puluhan model baru (Gemini 3.1, GPT-5.4, Claude 4.5/4.6, DeepSeek-R1/V3, Llama 4, dll).
+- **Enhancement**: *Human-readable Error Handling* (401, 404, 429).
+- **Enhancement**: Model Provider di-dropdown secara terpisah dan diurutkan sesuai abjad.
 
 ### Version 1.1
 - Fixed Chrome Web Store compliance by removing unused 'scripting' permission

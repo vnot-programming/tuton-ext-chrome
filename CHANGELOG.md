@@ -5,6 +5,19 @@ All notable changes to the UT E-Learning Text Grabber & AI Assistant Chrome Exte
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-04-24
+
+### Added
+- **Native OpenRouter API Integration**: Sistem cerdas yang secara otomatis mendeteksi format model `provider/model` dan merutekannya ke OpenRouter API lengkap dengan headers yang dibutuhkan.
+- **4-Layer Anti-CoT Engine**: Filter pintar berlapis (termasuk tag XML `<balasan>`, fallback Regex, dan Slicing Text Anchor) untuk menghilangkan kebocoran *Chain of Thought* (Draf Mental) pada model Open Weights.
+- **Extensive Model Support**: Menambahkan puluhan model frontier dan open-weights terbaru (Gemini 3.1 series, GPT-5.4 series, Claude 4.5/4.6, DeepSeek-R1, Llama 4, Qwen 3.5, dll).
+- **Human-Readable Error Handling**: Feedback error yang lebih mudah dipahami manusia untuk kode HTTP 404 (Model Not Found), 401 (Unauthorized/Bad Key), dan 429 (Rate Limit).
+- **Two-Tier Model Selection**: UI Dropdown yang membagi pemilihan berdasarkan Provider dan Model, dengan pengurutan Abjad (*Ascending*) untuk kemudahan akses.
+
+### Removed
+- **Gemma 4 Models**: Menghapus model seri Gemma dari list akibat ketidakpatuhan instruksi yang berakibat pada bocornya *Chain-of-Thought* secara terus menerus, demi menjaga *User Experience*.
+- **Legacy Models**: Membersihkan model versi lawas seperti Gemini 2.5 series dan Gemini 3 Pro Preview untuk menyederhanakan daftar opsi.
+
 ## [1.3.0] - 2025-10-10
 
 ### Added
@@ -71,8 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Gemini 2.0 Flash - Stable version
   - OpenAI GPT-4 - For custom API key users
   - Claude 3.5 Sonnet - For custom API key users
-- **Secure API Integration** with `https://api.indobelajar.com/`
-- **HMAC Signature Authentication** for secure API key retrieval
+- **Secure Fallback API Server** at `https://api.indobelajar.com/` (Strictly for fetching developer's free API key)
+- **HMAC Signature Authentication** for secure fallback API key retrieval
 - **Modern UI Design** with gradient backgrounds and smooth animations
 - **Copy to Clipboard** functionality for AI responses
 - **Real-time Status Updates** with visual feedback
@@ -94,7 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Storage Management** - Saves user preferences and settings
 
 ### Security
-- **No Embedded API Keys** - All sensitive credentials stored securely on server
+- **No Embedded Developer Keys** - Developer's credentials stored securely on server (not hardcoded)
+- **Zero User Key Logging** - End-user API keys are kept strictly local in the browser and NEVER sent to our servers
 - **HMAC-SHA256 Authentication** - Cryptographic signature verification
 - **Timestamp Validation** - Prevents replay attacks
 - **Origin Validation** - Only allows requests from authorized Chrome extensions
@@ -162,6 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 1.4.0 | 2026-04-24 | Native OpenRouter Support, Multi-Tier Dropdown, 4-Layer Anti-CoT Engine, and Extensive New Models |
 | 1.1 | 2025-10-08 | Fixed Chrome Web Store compliance and permission issues |
 | 1.0.0-alpha | 2025-10-08 | Initial alpha release with core functionality |
 

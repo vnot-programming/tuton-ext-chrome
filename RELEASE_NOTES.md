@@ -1,16 +1,29 @@
 # Release Notes
 
-## 🎓 UT E-Learning Text Grabber & AI Assistant v1.3.0
+## 🎓 UT E-Learning Text Grabber & AI Assistant v1.4.0
 
-**Release Date:** October 10, 2025  
-**Version:** 1.3.0  
+**Release Date:** April 24, 2026  
+**Version:** 1.4.0  
 **Status:** Stable Release
 
 ---
 
-## 🚀 What's New in v1.3.0
+## 🚀 What's New in v1.4.0
 
 ### 🆕 Major New Features
+- **🌐 OpenRouter Native Integration**: Seamless auto-routing capabilities for any `provider/model` formatted string.
+- **🛡️ 4-Layer Anti-CoT Engine**: An aggressive text extraction algorithm that prevents "Thinking/Mental Draft" leakage from highly-aligned instruction-tuned models.
+- **🗂️ Split Dropdown UI**: Revamped AI selection interface separating Providers from Models, complete with ascending alphabetical sorting.
+- **💬 Smart Error Reporting**: Human-readable error translations for HTTP 401, 404, and 429 API failures.
+
+### 🤖 Huge AI Model Roster Update
+- Added **Gemini 3.1 Flash/Pro**, **GPT-5.4 Series**, **Claude 4.5/4.6**.
+- Added top-tier Open-weights via OpenRouter: **DeepSeek-R1 & V3**, **Llama 4 (Maverick)**, **GLM-5**, **MiniMax M2.5**, and **Qwen 3.5**.
+- Removed outdated models (Gemini 2.5) and incompatible models (Gemma 4) to maintain top-tier response quality.
+
+---
+
+## 🚀 Core Features (from v1.3.0)
 - **📚 RAT Integration**: Added input fields for RAT (Rancangan Aktivitas Tutorial) course description and learning outcomes
 - **🎓 Academic Reference Evaluation**: AI now evaluates student responses for proper academic references and citations
 - **🔍 Enhanced Text Extraction**: Improved forum post extraction with better content detection
@@ -31,13 +44,13 @@
 ### ✨ Core Features (from v1.0)
 - **🎯 Smart Text Extraction** - Automatically grabs text from UT e-learning forum discussions and course content
 - **🤖 Multi-AI Support** - Choose from Gemini 2.5 Flash, Gemini 2.5 Pro, Gemini 2.0 Flash, OpenAI GPT-4, or Claude 3.5 Sonnet
-- **🔐 Secure API Integration** - Your API keys are stored safely on our secure server
+- **🔐 100% Privacy & Local Storage** - Your custom API keys are strictly kept locally in your browser and sent directly to AI providers. We NEVER intercept or store your keys.
 - **📋 One-Click Copy** - Copy AI responses directly to your clipboard
 - **🎨 Modern Interface** - Beautiful, intuitive design that's easy to use
 
 ### 🛡️ Security & Privacy
-- **🔒 No Embedded Keys** - API keys are never stored in the extension
-- **🔑 HMAC Authentication** - Military-grade security for all API communications
+- **🔒 Zero Server Storage for User Keys** - Your personal API keys are NEVER sent to our servers.
+- **🔑 HMAC Authentication** - Military-grade security for fetching developer's fallback/free API keys.
 - **⏰ Timestamp Protection** - Prevents replay attacks and unauthorized access
 - **🚫 Rate Limiting** - Protects against abuse with intelligent request limiting
 - **🌐 CORS Protection** - Secure cross-origin request handling
@@ -93,7 +106,7 @@
 - **Web Crypto API** - Secure cryptographic operations
 
 ### 🌐 API Integration
-- **Secure Server** - `https://api.indobelajar.com/`
+- **Fallback Server** - `https://api.indobelajar.com/` (Only used to securely fetch developer's free fallback API key)
 - **HMAC-SHA256** - Cryptographic authentication
 - **Rate Limiting** - 100 requests per 15 minutes
 - **Error Handling** - Comprehensive error management
@@ -153,8 +166,8 @@
 
 ### 🔐 API Security
 - **Encrypted Communication** - All API calls use HTTPS
-- **Secure Authentication** - HMAC signature verification
-- **No Key Storage** - API keys never stored in extension
+- **Secure Authentication** - HMAC signature verification for fallback key retrieval
+- **Zero Key Logging** - Your personal API keys are strictly kept locally and never transmitted to our backend.
 - **Rate Limiting** - Prevents abuse and protects resources
 
 ### 🛡️ Privacy Policy

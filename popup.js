@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+  const aiProviderSelect = document.getElementById('aiProvider');
   const aiModelSelect = document.getElementById('aiModel');
   const customApiKeyInput = document.getElementById('customApiKey');
   const customApiKeySection = document.getElementById('customApiKeySection');
@@ -15,11 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const ratStatus = document.getElementById('ratStatus');
   const clearRAT = document.getElementById('clearRAT');
   const pasteFromClipboard = document.getElementById('pasteFromClipboard');
-  
+
   // Tab Sheet elements
   const tabMain = document.getElementById('tabMain');
+  const tabRat = document.getElementById('tabRat');
   const tabPenilaian = document.getElementById('tabPenilaian');
   const mainSheet = document.getElementById('mainSheet');
+  const ratSheet = document.getElementById('ratSheet');
   const penilaianSheet = document.getElementById('penilaianSheet');
   const pdfUpload = document.getElementById('pdfUpload');
   const pdfStatus = document.getElementById('pdfStatus');
@@ -35,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let extractedText = '';
   let ratText = '';
   let uploadedPDF = null;
-  
+
   // API Configuration
   const API_CONFIG = {
     baseUrl: 'https://api.indobelajar.com',
@@ -50,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const encoder = new TextEncoder();
     const keyData = encoder.encode(secretKey);
     const messageData = encoder.encode(data);
-    
+
     const cryptoKey = await crypto.subtle.importKey(
       'raw',
       keyData,
@@ -58,13 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
       false,
       ['sign']
     );
-    
+
     const signature = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
     const signatureArray = new Uint8Array(signature);
     const signatureHex = Array.from(signatureArray)
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
-    
+
     return signatureHex;
   }
 
@@ -78,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         API_CONFIG.apiKey,
         API_CONFIG.secretKey
       );
-      
+
       const response = await fetch(`${API_CONFIG.baseUrl}/api/key`, {
         method: 'GET',
         headers: {
@@ -88,22 +91,73 @@ document.addEventListener('DOMContentLoaded', function() {
           'x-signature': signature
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const result = await response.json();
       return result.data.gemini_api_key;
-      
+
     } catch (error) {
       console.error('Error getting Gemini API key:', error);
       throw error;
     }
   }
 
+  const modelOptions = {
+    google: [
+      { value: 'auto', label: 'Auto (Gemini 3.1 Flash Lite)' },
+      { value: 'gemini-3.1-flash-preview', label: 'Gemini 3.1 Flash' },
+      { value: 'gemini-3.1-flash-lite-preview', label: 'Gemini 3.1 Flash Lite' },
+      { value: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro' }
+    ],
+    openai: [
+      { value: 'gpt-4o', label: 'GPT-4o' },
+      { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+      { value: 'gpt-5.4', label: 'GPT-5.4' },
+      { value: 'gpt-5.4-mini', label: 'GPT-5.4 Mini' },
+      { value: 'gpt-5.4-pro', label: 'GPT-5.4 Pro' },
+      { value: 'openai/gpt-oss-120b:free', label: 'GPT-OSS-120B (by OpenRouter)' }
+    ],
+    anthropic: [
+      { value: 'claude-haiku-4.5', label: 'Claude Haiku 4.5' },
+      { value: 'claude-opus-4.6', label: 'Claude Opus 4.6' },
+      { value: 'claude-sonnet-4.5', label: 'Claude Sonnet 4.5' }
+    ],
+    others: [
+      { value: 'deepseek-r1', label: 'DeepSeek-R1' },
+      { value: 'deepseek-v3', label: 'DeepSeek-V3' },
+      { value: 'z-ai/glm-4.5-air:free', label: 'GLM 4.5 Air (by OpenRouter)' },
+      { value: 'glm-5', label: 'GLM-5' },
+      { value: 'inclusionai/ling-2.6-flash:free', label: 'Ling-2.6-flash (by OpenRouter)' },
+      { value: 'llama-3.3', label: 'Llama 3.3' },
+      { value: 'llama-4-maverick', label: 'Llama 4 (Maverick)' },
+      { value: 'minimax/minimax-m2.5:free', label: 'MiniMax M2.5 (by OpenRouter)' },
+      { value: 'mistral-large-3', label: 'Mistral Large 3' },
+      { value: 'qwen-3.5', label: 'Qwen 3.5' }
+    ]
+  };
+
+  function updateModelList(provider) {
+    if (!aiModelSelect) return;
+    aiModelSelect.innerHTML = '';
+    const options = modelOptions[provider] || modelOptions['google'];
+    options.forEach(opt => {
+      const optionEl = document.createElement('option');
+      optionEl.value = opt.value;
+      optionEl.textContent = opt.label;
+      aiModelSelect.appendChild(optionEl);
+    });
+  }
+
   // Load saved settings
-  chrome.storage.sync.get(['selectedModel', 'customApiKey', 'deskripsiMataKuliah', 'capaianPembelajaran'], function(result) {
+  chrome.storage.sync.get(['selectedProvider', 'selectedModel', 'customApiKey', 'deskripsiMataKuliah', 'capaianPembelajaran'], function (result) {
+    const defaultProvider = result.selectedProvider || 'google';
+    if (aiProviderSelect) aiProviderSelect.value = defaultProvider;
+
+    updateModelList(defaultProvider);
+
     if (result.selectedModel) {
       aiModelSelect.value = result.selectedModel;
     } else {
@@ -121,58 +175,70 @@ document.addEventListener('DOMContentLoaded', function() {
     updateApiKeySection();
     updateRATContent(); // Update RAT content after loading
   });
-  
+
   // Auto extract text when popup opens
   autoExtractText();
 
+  // Handle provider selection change
+  if (aiProviderSelect) {
+    aiProviderSelect.addEventListener('change', function () {
+      updateModelList(this.value);
+      aiModelSelect.value = modelOptions[this.value][0].value;
+      updateApiKeySection();
+      chrome.storage.sync.set({ selectedProvider: this.value, selectedModel: aiModelSelect.value });
+    });
+  }
+
   // Handle model selection change
-  aiModelSelect.addEventListener('change', function() {
-    updateApiKeySection();
-    chrome.storage.sync.set({ selectedModel: aiModelSelect.value });
-  });
-  
+  if (aiModelSelect) {
+    aiModelSelect.addEventListener('change', function () {
+      updateApiKeySection();
+      chrome.storage.sync.set({ selectedModel: aiModelSelect.value });
+    });
+  }
+
   // Handle custom API key input
-  customApiKeyInput.addEventListener('input', function() {
+  customApiKeyInput.addEventListener('input', function () {
     chrome.storage.sync.set({ customApiKey: customApiKeyInput.value });
   });
-  
+
   // Handle RAT input changes
   deskripsiMataKuliah.addEventListener('input', updateRATContent);
   capaianPembelajaran.addEventListener('input', updateRATContent);
-  
+
   // Handle paste events
-  deskripsiMataKuliah.addEventListener('paste', function(e) {
+  deskripsiMataKuliah.addEventListener('paste', function (e) {
     setTimeout(updateRATContent, 10); // Small delay to ensure paste is complete
   });
-  capaianPembelajaran.addEventListener('paste', function(e) {
+  capaianPembelajaran.addEventListener('paste', function (e) {
     setTimeout(updateRATContent, 10); // Small delay to ensure paste is complete
   });
-  
+
   // Add focus/blur styling
-  deskripsiMataKuliah.addEventListener('focus', function() {
+  deskripsiMataKuliah.addEventListener('focus', function () {
     this.style.borderColor = 'rgba(46, 139, 87, 0.7)';
   });
-  deskripsiMataKuliah.addEventListener('blur', function() {
+  deskripsiMataKuliah.addEventListener('blur', function () {
     this.style.borderColor = 'rgba(255,255,255,0.3)';
   });
-  
-  capaianPembelajaran.addEventListener('focus', function() {
+
+  capaianPembelajaran.addEventListener('focus', function () {
     this.style.borderColor = 'rgba(46, 139, 87, 0.7)';
   });
-  capaianPembelajaran.addEventListener('blur', function() {
+  capaianPembelajaran.addEventListener('blur', function () {
     this.style.borderColor = 'rgba(255,255,255,0.3)';
   });
-  
+
   // Handle clear button
-  clearRAT.addEventListener('click', function() {
+  clearRAT.addEventListener('click', function () {
     deskripsiMataKuliah.value = '';
     capaianPembelajaran.value = '';
     updateRATContent();
     showStatus('RAT content cleared!', 'info', ratStatus);
   });
-  
+
   // Handle paste from clipboard button
-  pasteFromClipboard.addEventListener('click', async function() {
+  pasteFromClipboard.addEventListener('click', async function () {
     try {
       const clipboardText = await navigator.clipboard.readText();
       if (clipboardText) {
@@ -202,17 +268,17 @@ document.addEventListener('DOMContentLoaded', function() {
       showStatus('Cannot access clipboard. Please paste manually (Ctrl+V)', 'error', ratStatus);
     }
   });
-  
+
   function updateRATContent() {
     const deskripsi = deskripsiMataKuliah.value.trim();
     const capaian = capaianPembelajaran.value.trim();
-    
+
     // Save to storage
     chrome.storage.sync.set({
       deskripsiMataKuliah: deskripsi,
       capaianPembelajaran: capaian
     });
-    
+
     if (deskripsi || capaian) {
       ratText = '';
       if (deskripsi) {
@@ -228,71 +294,91 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  
-  
+
+
   // Function to update API key section visibility
   function updateApiKeySection() {
     const selectedModel = aiModelSelect.value;
+    // Tampilkan selalu opsi custom API key sebagai fallback
+    customApiKeySection.style.display = 'block';
+
+    // Ubah placeholder untuk memperjelas
     if (selectedModel === 'auto' || selectedModel.startsWith('gemini')) {
-      customApiKeySection.style.display = 'none';
+      customApiKeyInput.placeholder = "Opsional: Isi Gemini API Key jika server error";
     } else {
-      customApiKeySection.style.display = 'block';
+      customApiKeyInput.placeholder = "Wajib: Masukkan API key Anda di sini";
     }
   }
-  
+
 
   // Auto extract text function
   function autoExtractText() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { action: 'grabText' }, function(response) {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      if (!tabs || !tabs[0] || !tabs[0].url) return;
+
+      const currentUrl = tabs[0].url;
+      // Memastikan ekstensi hanya dijalankan di halaman e-learning UT
+      if (!currentUrl.includes('elearning.ut.ac.id')) {
+        showStatus('Mohon buka web e-learning UT terlebih dahulu.', 'info');
+        return;
+      }
+
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'grabText' }, function (response) {
         if (chrome.runtime.lastError) {
-          showStatus('Error: ' + chrome.runtime.lastError.message, 'error');
+          console.warn('Content script belum terhubung:', chrome.runtime.lastError.message);
+          showStatus('Halaman belum termuat sepenuhnya. Silakan refresh halaman.', 'info');
           return;
         }
 
         if (response && response.success) {
           extractedText = response.text;
           extractedTextDiv.textContent = extractedText;
-          extractedTextDiv.style.display = 'block';
-          showStatus('Text extracted automatically!', 'success');
+          extractedTextDiv.style.display = 'none';
+
+          if (response.savedResponse) {
+            aiResponseDiv.textContent = response.savedResponse;
+            aiResponseContainer.style.display = 'block';
+          }
+
+          showStatus('Teks berhasil diekstrak otomatis!', 'success');
         } else {
-          showStatus('Failed to extract text: ' + (response?.error || 'Unknown error'), 'error');
+          showStatus('Gagal mengekstrak teks: ' + (response?.error || 'Unknown error'), 'error');
         }
       });
     });
   }
 
   // Generate answer with AI
-  generateAnswerBtn.addEventListener('click', async function() {
+  generateAnswerBtn.addEventListener('click', async function () {
     if (!extractedText) {
       showStatus('No text extracted. Please refresh the page and try again.', 'error');
       return;
     }
 
+    const selectedProvider = document.getElementById('aiProvider').value;
     const selectedModel = aiModelSelect.value;
     let apiKey = '';
     let actualModel = selectedModel;
 
     // Determine API key and model
-    if (selectedModel === 'auto') {
-      try {
-        apiKey = await getGeminiApiKey();
-        actualModel = 'gemini-2.5-flash'; // Default for auto
-      } catch (error) {
-        showStatus('Failed to get API key from server: ' + error.message, 'error');
-        return;
-      }
-    } else if (selectedModel.startsWith('gemini')) {
-      try {
-        apiKey = await getGeminiApiKey();
-        actualModel = selectedModel;
-      } catch (error) {
-        showStatus('Failed to get API key from server: ' + error.message, 'error');
-        return;
+    const manualKey = customApiKeyInput.value.trim();
+
+    if (selectedProvider === 'google') {
+      actualModel = selectedModel === 'auto' ? 'gemini-3.1-flash-lite-preview' : selectedModel;
+
+      if (manualKey) {
+        apiKey = manualKey;
+      } else {
+        try {
+          apiKey = await getGeminiApiKey();
+        } catch (error) {
+          showStatus('Server indobelajar down (502). Masukkan Gemini API Key manual.', 'error');
+          return;
+        }
       }
     } else {
-      // For non-Gemini models, use custom API key
-      apiKey = customApiKeyInput.value.trim();
+      // For non-Google models, we REQUIRE manual API key
+      apiKey = manualKey;
       if (!apiKey) {
         showStatus('Please enter API key for ' + selectedModel, 'error');
         return;
@@ -304,16 +390,64 @@ document.addEventListener('DOMContentLoaded', function() {
     generateAnswerBtn.disabled = true;
 
     // Call AI API based on selected model
-    callAIAPI(apiKey, actualModel, extractedText)
+    callAIAPI(apiKey, actualModel, extractedText, selectedProvider)
       .then(response => {
         loadingDiv.style.display = 'none';
         generateAnswerBtn.disabled = false;
-        
+
         if (response.success) {
-          aiResponseDiv.textContent = response.answer;
+          let finalAnswer = response.answer;
+          
+          // 1. Coba cari tag <balasan> (prioritas utama)
+          const balasanMatch = finalAnswer.match(/<balasan>([\s\S]*?)<\/balasan>/i);
+          if (balasanMatch) {
+            finalAnswer = balasanMatch[1].trim();
+          } else {
+            // 2. Jika tag XML gagal/tidak ada, coba potong berdasarkan pola "Final Text" atau "Revised Final" yang sering bocor dari CoT model
+            const fallbackRegex = /\*(?:Final Text Construction|Revised Final|Final Polish|Final Version|Final Text|Balasan Akhir)[^:]*:\*?\s*([\s\S]*?)(?:$|\n\*)/i;
+            const fallbackMatch = finalAnswer.match(fallbackRegex);
+            if (fallbackMatch && fallbackMatch[1].trim().length > 0) {
+              finalAnswer = fallbackMatch[1].trim();
+            } else {
+              // 3. Fallback kasar: ambil teks setelah blok "**" atau "*" terakhir jika sangat panjang
+              const lastAsteriskSplit = finalAnswer.split(/\n\s*\*(?!\*)/); // Pisahkan berdasarkan bullet/asterisk di awal baris
+              if (lastAsteriskSplit.length > 1) {
+                  const possibleFinal = lastAsteriskSplit[lastAsteriskSplit.length - 1].trim();
+                  // Asumsi teks akhir cukup panjang, bukan sekadar kalimat penutup evaluasi
+                  if (possibleFinal.length > 100) {
+                      finalAnswer = possibleFinal;
+                  }
+              }
+            }
+          }
+
+          // 4. Final Aggressive Cleanup (Layer 4): 
+          // Karena Prompt Rule #18 memaksa model memunculkan "Selamat pagi/siang/sore/malam",
+          // Kita bisa memotong (trim) semua teks sampah yang bocor sebelum kata sapaan tersebut.
+          const sapaanRegex = /(?:Halo.*?|Hai.*?)?Selamat (?:pagi|siang|sore|malam)/i;
+          const sapaanMatch = finalAnswer.match(sapaanRegex);
+          if (sapaanMatch) {
+              const matchIndex = finalAnswer.indexOf(sapaanMatch[0]);
+              // Jika sapaan ditemukan di bagian awal/tengah (bukan di akhir banget), potong semuanya sebelum sapaan
+              if (matchIndex >= 0 && matchIndex < 500) {
+                  finalAnswer = finalAnswer.substring(matchIndex).trim();
+              }
+          }
+
+          // Bersihkan sisa-sisa asterisk atau kutipan di awal jika masih ada
+          finalAnswer = finalAnswer.replace(/^["'*`\s]+/, '');
+
+          aiResponseDiv.textContent = finalAnswer;
           aiResponseContainer.style.display = 'block';
           tryDifferentModelBtn.style.display = 'none';
           showStatus('Answer generated successfully!', 'success');
+
+          // Simpan hasil ke content script agar bertahan jika popup ditutup
+          chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            if (tabs && tabs[0]) {
+              chrome.tabs.sendMessage(tabs[0].id, { action: 'saveResponse', text: finalAnswer });
+            }
+          });
         } else {
           showStatus('Error: ' + response.error, 'error');
           tryDifferentModelBtn.style.display = 'block';
@@ -328,10 +462,10 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Copy response button
-  copyResponseBtn.addEventListener('click', function() {
+  copyResponseBtn.addEventListener('click', function () {
     const responseText = aiResponseDiv.textContent;
     if (responseText) {
-      navigator.clipboard.writeText(responseText).then(function() {
+      navigator.clipboard.writeText(responseText).then(function () {
         showStatus('Response copied to clipboard!', 'success');
         // Change button text temporarily
         const originalText = copyResponseBtn.textContent;
@@ -339,27 +473,28 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
           copyResponseBtn.textContent = originalText;
         }, 2000);
-      }).catch(function(err) {
+      }).catch(function (err) {
         showStatus('Failed to copy: ' + err, 'error');
       });
     }
   });
 
   // Try different model button
-  tryDifferentModelBtn.addEventListener('click', function() {
-    // Cycle through different models (prioritizing the latest ones)
-    const models = ['auto', 'gemini-2.5-flash', 'nano-banana', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-flash-latest', 'openai-gpt', 'claude'];
+  tryDifferentModelBtn.addEventListener('click', function () {
+    const aiProviderSelect = document.getElementById('aiProvider');
+    const currentProvider = aiProviderSelect ? aiProviderSelect.value : 'google';
+    const options = modelOptions[currentProvider] || modelOptions['google'];
     const currentModel = aiModelSelect.value;
-    const currentIndex = models.indexOf(currentModel);
-    const nextIndex = (currentIndex + 1) % models.length;
-    
-    aiModelSelect.value = models[nextIndex];
+    const currentIndex = options.findIndex(opt => opt.value === currentModel);
+    const nextIndex = (currentIndex + 1) % options.length;
+
+    aiModelSelect.value = options[nextIndex].value;
     updateApiKeySection();
-    showStatus(`Switched to ${aiModelSelect.options[aiModelSelect.selectedIndex].text}`, 'info');
-    
+    showStatus(`Switched to ${options[nextIndex].label}`, 'info');
+
     // Save the new model selection
-    chrome.storage.sync.set({ selectedModel: models[nextIndex] });
-    
+    chrome.storage.sync.set({ selectedModel: aiModelSelect.value });
+
     // Hide the button
     tryDifferentModelBtn.style.display = 'none';
   });
@@ -370,14 +505,25 @@ document.addEventListener('DOMContentLoaded', function() {
     targetElement.textContent = message;
     targetElement.className = 'status ' + type;
     targetElement.style.display = 'block';
-    
+
     setTimeout(() => {
       targetElement.style.display = 'none';
     }, 3000);
   }
 
-  // Function to call AI API based on selected model
-  async function callAIAPI(apiKey, model, text) {
+  // Function to call AI API based on selected provider and model
+  async function callAIAPI(apiKey, model, text, provider = 'google') {
+    // Menentukan waktu berdasarkan jam komputer saat ini
+    const hour = new Date().getHours();
+    let waktuSekarang = "pagi";
+    if (hour >= 10 && hour < 15) {
+      waktuSekarang = "siang";
+    } else if (hour >= 15 && hour < 18) {
+      waktuSekarang = "sore";
+    } else if (hour >= 18 || hour < 4) {
+      waktuSekarang = "malam";
+    }
+
     let prompt = `Anda adalah seorang dosen atau tutor yang membantu mahasiswa di forum diskusi UT. 
 
 Teks berikut adalah postingan dari mahasiswa di forum:
@@ -411,28 +557,23 @@ ${text}`;
 15. Berikan saran untuk menambahkan referensi jika jawaban tidak memilikinya
 16. Berikan feedback konstruktif untuk meningkatkan kualitas akademik jawaban
 17. Di akhir, berikan semangat kepada mahasiswa tanpa membuat summary atau kesimpulan
+18. PENTING: Waktu komputer saat ini adalah ${waktuSekarang}. Jika Anda mengawali atau membalas ucapan salam waktu (seperti selamat pagi/siang/sore/malam), Anda WAJIB menggunakan sapaan "Selamat ${waktuSekarang}", tanpa terpengaruh oleh salam waktu yang ditulis mahasiswa di postingannya.
+19. SANGAT PENTING: JANGAN PERNAH memperkenalkan diri atau menggunakan teks *placeholder* seperti "[Nama Tutor/Dosen]". Nama akun Anda sudah otomatis terlihat di forum, jadi langsung saja masuk ke isi pembahasan dan jangan menuliskan nama pengirim di akhir pesan.
+20. ATURAN FINAL SANGAT PENTING: Anda WAJIB membungkus hasil akhir teks balasan Anda secara eksklusif di dalam tag <balasan> dan </balasan>. Segala proses berpikir atau draf yang Anda buat harus berada di luar tag tersebut.
 
 Tulis respons seperti teman yang sedang membantu di forum:`;
 
     try {
-      switch (model) {
-        case 'auto':
-        case 'gemini-2.5-flash':
-          return await callGemini25Flash(apiKey, prompt);
-        case 'nano-banana':
-          return await callNanoBanana(apiKey, prompt);
-        case 'gemini-2.5-pro':
-          return await callGemini25Pro(apiKey, prompt);
-        case 'gemini-2.0-flash':
-          return await callGemini20Flash(apiKey, prompt);
-        case 'gemini-flash-latest':
-          return await callGeminiFlashLatest(apiKey, prompt);
-        case 'openai-gpt':
-          return await callOpenAI(apiKey, prompt);
-        case 'claude':
-          return await callClaude(apiKey, prompt);
-        default:
-          return await callGemini25Flash(apiKey, prompt);
+      if (provider === 'google') {
+        return await callGoogleAPI(apiKey, model, prompt);
+      } else if (provider === 'openai') {
+        return await callOpenAIAPI(apiKey, model, prompt);
+      } else if (provider === 'anthropic') {
+        return await callAnthropicAPI(apiKey, model, prompt);
+      } else if (provider === 'others') {
+        return await callOthersAPI(apiKey, model, prompt);
+      } else {
+        return await callGoogleAPI(apiKey, model, prompt);
       }
     } catch (error) {
       return {
@@ -442,268 +583,196 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     }
   }
 
-  // Gemini 2.5 Flash API call (Latest and fastest)
-  async function callGemini25Flash(apiKey, prompt) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+  // API Fetch implementation based on provider
+  async function callGoogleAPI(apiKey, model, prompt) {
+    let modelName = model === 'auto' ? 'gemini-3.1-flash-lite-preview' : model;
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }],
-        generationConfig: {
-          thinkingConfig: {
-            thinkingBudget: 0 // Disable thinking for faster responses
-          }
-        }
+        contents: [{ parts: [{ text: prompt }] }]
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini 2.5 Flash API failed: ${response.status} ${response.statusText}`);
+      let errorMsg = `Google API Error (${response.status}): `;
+      if (response.status === 404) errorMsg += `Model '${modelName}' tidak ditemukan (Not Found). Pastikan nama model sudah benar.`;
+      else if (response.status === 403 || response.status === 400) errorMsg += `API Key tidak valid atau akses ditolak.`;
+      else if (response.status === 429) errorMsg += `Limit kuota habis (Too Many Requests).`;
+      else if (response.status === 503) errorMsg += `Server Google sedang sibuk/overload (Service Unavailable).`;
+      else errorMsg += response.statusText;
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();
-    
     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return {
-        success: true,
-        answer: data.candidates[0].content.parts[0].text
-      };
+      return { success: true, answer: data.candidates[0].content.parts[0].text };
     } else {
-      throw new Error('Invalid response format from Gemini 2.5 Flash API');
+      throw new Error('Invalid response format from Google API');
     }
   }
 
-  // Nano Banana API call (Ultra lightweight)
-  async function callNanoBanana(apiKey, prompt) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
-      })
-    });
+  async function callOpenAIAPI(apiKey, model, prompt) {
+    let baseUrl = 'https://api.openai.com/v1/chat/completions';
+    let extraHeaders = {};
 
-    if (!response.ok) {
-      throw new Error(`Nano Banana API failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return {
-        success: true,
-        answer: data.candidates[0].content.parts[0].text
+    if (model.includes('/')) {
+      baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+      extraHeaders = {
+        'HTTP-Referer': 'https://elearning.ut.ac.id',
+        'X-OpenRouter-Title': 'UT Assistant'
       };
-    } else {
-      throw new Error('Invalid response format from Nano Banana API');
     }
-  }
 
-  // Gemini 2.5 Pro API call (Highest quality with thinking enabled)
-  async function callGemini25Pro(apiKey, prompt) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`, {
+    const response = await fetch(baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        ...extraHeaders
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }],
-        generationConfig: {
-          thinkingConfig: {
-            thinkingBudget: 1 // Enable thinking for better quality
-          }
-        }
+        model: model,
+        messages: [{ role: 'user', content: prompt }]
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini 2.5 Pro API failed: ${response.status} ${response.statusText}`);
+      let errorMsg = `OpenAI API Error (${response.status}): `;
+      if (response.status === 404) errorMsg += `Model '${model}' tidak tersedia.`;
+      else if (response.status === 401 || response.status === 403) errorMsg += `API Key OpenAI salah atau tidak memiliki saldo.`;
+      else if (response.status === 429) errorMsg += `Rate limit tercapai.`;
+      else errorMsg += response.statusText;
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return {
-        success: true,
-        answer: data.candidates[0].content.parts[0].text
-      };
-    } else {
-      throw new Error('Invalid response format from Gemini 2.5 Pro API');
-    }
-  }
-
-  // Gemini 2.0 Flash API call (Stable version)
-  async function callGemini20Flash(apiKey, prompt) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemini 2.0 Flash API failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return {
-        success: true,
-        answer: data.candidates[0].content.parts[0].text
-      };
-    } else {
-      throw new Error('Invalid response format from Gemini 2.0 Flash API');
-    }
-  }
-
-  // Gemini Flash Latest API call
-  async function callGeminiFlashLatest(apiKey, prompt) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }],
-        generationConfig: {
-          thinkingConfig: {
-            thinkingBudget: 0 // Disable thinking for faster responses
-          }
-        }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemini Flash Latest API failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return {
-        success: true,
-        answer: data.candidates[0].content.parts[0].text
-      };
-    } else {
-      throw new Error('Invalid response format from Gemini Flash Latest API');
-    }
-  }
-
-  // OpenAI GPT API call
-  async function callOpenAI(apiKey, prompt) {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    
     if (data.choices && data.choices[0] && data.choices[0].message) {
-      return {
-        success: true,
-        answer: data.choices[0].message.content
-      };
+      return { success: true, answer: data.choices[0].message.content };
     } else {
       throw new Error('Invalid response format from OpenAI API');
     }
   }
 
-  // Claude API call
-  async function callClaude(apiKey, prompt) {
+  async function callAnthropicAPI(apiKey, model, prompt) {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerously-allow-custom-urls': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
+        model: model,
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Claude API failed: ${response.status} ${response.statusText}`);
+      let errorMsg = `Anthropic API Error (${response.status}): `;
+      if (response.status === 404) errorMsg += `Model '${model}' tidak tersedia.`;
+      else if (response.status === 401 || response.status === 403) errorMsg += `API Key Claude salah atau ditolak.`;
+      else if (response.status === 429) errorMsg += `Rate limit tercapai.`;
+      else errorMsg += response.statusText;
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();
-    
     if (data.content && data.content[0] && data.content[0].text) {
-      return {
-        success: true,
-        answer: data.content[0].text
-      };
+      return { success: true, answer: data.content[0].text };
     } else {
-      throw new Error('Invalid response format from Claude API');
+      throw new Error('Invalid response format from Anthropic API');
+    }
+  }
+
+  async function callOthersAPI(apiKey, model, prompt) {
+    let baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
+    let providerName = 'Groq';
+    let extraHeaders = {};
+
+    if (model.includes('/')) {
+      baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+      providerName = 'OpenRouter';
+      extraHeaders = {
+        'HTTP-Referer': 'https://elearning.ut.ac.id',
+        'X-OpenRouter-Title': 'UT Assistant'
+      };
+    } else if (model.includes('deepseek')) {
+      baseUrl = 'https://api.deepseek.com/chat/completions';
+      providerName = 'DeepSeek';
+    } else if (model.includes('mistral')) {
+      baseUrl = 'https://api.mistral.ai/v1/chat/completions';
+      providerName = 'Mistral';
+    } else if (model.includes('glm')) {
+      baseUrl = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+      providerName = 'Zhipu AI';
+    } else if (model.includes('qwen')) {
+      baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+      providerName = 'Alibaba DashScope';
+    }
+
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        ...extraHeaders
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      let errorMsg = `${providerName} API Error (${response.status}): `;
+      if (response.status === 404) errorMsg += `Model '${model}' tidak ditemukan di ${providerName}.`;
+      else if (response.status === 401 || response.status === 403) errorMsg += `API Key Anda salah/ditolak.`;
+      else if (response.status === 429) errorMsg += `Rate limit tercapai.`;
+      else errorMsg += response.statusText;
+      throw new Error(errorMsg);
+    }
+
+    const data = await response.json();
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      return { success: true, answer: data.choices[0].message.content };
+    } else {
+      throw new Error('Invalid response format from API');
     }
   }
 
   // Tab Sheet switching functionality
   if (tabMain) {
-    tabMain.addEventListener('click', function() {
+    tabMain.addEventListener('click', function () {
       switchTabSheet('main');
     });
   }
 
+  if (tabRat) {
+    tabRat.addEventListener('click', function () {
+      switchTabSheet('rat');
+    });
+  }
+
   if (tabPenilaian) {
-    tabPenilaian.addEventListener('click', function() {
+    tabPenilaian.addEventListener('click', function () {
       switchTabSheet('penilaian');
     });
   }
 
   // PDF upload functionality
   if (pdfUpload) {
-    pdfUpload.addEventListener('change', function(event) {
+    pdfUpload.addEventListener('change', function (event) {
       handlePDFUpload(event);
     });
   }
 
   // PDF analysis functionality
   if (analyzePDFBtn) {
-    analyzePDFBtn.addEventListener('click', function() {
+    analyzePDFBtn.addEventListener('click', function () {
       analyzeUploadedPDF();
     });
   }
@@ -711,17 +780,19 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
   // Tab Sheet switching function
   function switchTabSheet(tabName) {
     console.log('Switching to tab sheet:', tabName);
-    
+
     // Check if elements exist
     if (!tabMain || !tabPenilaian || !mainSheet || !penilaianSheet) {
       console.error('Tab sheet elements not found!');
       return;
     }
-    
+
     // Remove active class from all tabs and sheets
     tabMain.classList.remove('active');
+    if (tabRat) tabRat.classList.remove('active');
     tabPenilaian.classList.remove('active');
     mainSheet.classList.remove('active');
+    if (ratSheet) ratSheet.classList.remove('active');
     penilaianSheet.classList.remove('active');
 
     // Add active class to selected tab and sheet
@@ -729,14 +800,18 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
       tabMain.classList.add('active');
       mainSheet.classList.add('active');
       console.log('Switched to main sheet');
+    } else if (tabName === 'rat') {
+      if (tabRat) tabRat.classList.add('active');
+      if (ratSheet) ratSheet.classList.add('active');
+      console.log('Switched to rat sheet');
     } else if (tabName === 'penilaian') {
       tabPenilaian.classList.add('active');
       penilaianSheet.classList.add('active');
       console.log('Switched to penilaian sheet');
       console.log('penilaianSheet display:', window.getComputedStyle(penilaianSheet).display);
-      
+
       // Tab sheet switching successful
-      
+
       // Ensure text visibility in Penilaian Sheet
       const section = penilaianSheet.querySelector('.section');
       if (section) {
@@ -744,23 +819,23 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
         const h3 = section.querySelector('h3');
         const p = section.querySelector('p');
         const label = section.querySelector('label');
-        
+
         if (h3) {
           h3.style.color = 'white';
           h3.style.fontSize = '16px';
           h3.style.fontWeight = 'bold';
         }
-        
+
         if (p) {
           p.style.color = 'white';
           p.style.fontSize = '14px';
         }
-        
+
         if (label) {
           label.style.color = 'white';
           label.style.fontSize = '12px';
         }
-        
+
         console.log('Penilaian section found and styled:', section);
         console.log('Section innerHTML length:', section.innerHTML.length);
       } else {
@@ -773,19 +848,19 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
   // PDF upload handling function
   async function handlePDFUpload(event) {
     const file = event.target.files[0];
-    
+
     if (!file) {
       return;
     }
-    
+
     if (file.type !== 'application/pdf') {
       showStatus('Please select a PDF file', 'error', pdfStatus);
       return;
     }
-    
+
     try {
       showStatus('Processing PDF file...', 'info', pdfStatus);
-      
+
       // Store file info
       uploadedPDF = {
         file: file,
@@ -793,17 +868,17 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
         size: file.size,
         text: null
       };
-      
+
       // Display file info
       displayPDFInfo();
-      
+
       // Extract text from PDF
       const text = await extractTextFromPDF(file);
       uploadedPDF.text = text;
-      
+
       showStatus('PDF processed successfully!', 'success', pdfStatus);
       pdfAnalysis.style.display = 'block';
-      
+
     } catch (error) {
       console.error('Error processing PDF:', error);
       showStatus('Error processing PDF: ' + error.message, 'error', pdfStatus);
@@ -835,22 +910,22 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
   async function extractTextFromPDF(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
-      reader.onload = async function(e) {
+
+      reader.onload = async function (e) {
         try {
           const arrayBuffer = e.target.result;
-          
+
           // Load PDF.js library if not already loaded
           if (!window.pdfjsLib) {
             await loadPDFJS();
           }
-          
+
           // Load PDF using PDF.js
           const pdf = await window.pdfjsLib.getDocument(arrayBuffer).promise;
           console.log('PDF loaded, pages:', pdf.numPages);
-          
+
           let fullText = '';
-          
+
           // Iterate through each page to extract text
           for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
@@ -858,17 +933,17 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
             const pageText = textContent.items.map(item => item.str).join(' ');
             fullText += pageText + '\n';
           }
-          
+
           resolve(fullText);
         } catch (error) {
           reject(error);
         }
       };
-      
-      reader.onerror = function() {
+
+      reader.onerror = function () {
         reject(new Error('Failed to read PDF file'));
       };
-      
+
       reader.readAsArrayBuffer(file);
     });
   }

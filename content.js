@@ -1,11 +1,19 @@
 // Content script for UT E-Learning Text Grabber & AI Assistant
 
+let savedAiResponse = null;
+
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'saveResponse') {
+    savedAiResponse = request.text;
+    sendResponse({ success: true });
+    return false;
+  }
+
   if (request.action === 'grabText') {
     grabTextFromPage()
       .then(text => {
-        sendResponse({ success: true, text: text });
+        sendResponse({ success: true, text: text, savedResponse: savedAiResponse });
       })
       .catch(error => {
         sendResponse({ success: false, error: error.message });
