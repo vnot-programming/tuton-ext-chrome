@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "UT E-Learning Text Grabber & AI Assistant",
   "version": "1.7.0",
-  "description": "Grab text from UT e-learning platform and generate answers using Gemini AI",
+  "description": "Grab text from UT e-learning platform and generate answers using AI",
   "permissions": [
     "activeTab",
     "storage"
@@ -17,8 +17,7 @@
     "https://api.deepseek.com/*",
     "https://api.mistral.ai/*",
     "https://open.bigmodel.cn/*",
-    "https://dashscope.aliyuncs.com/*",
-    "https://*/*"
+    "https://dashscope.aliyuncs.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -26,8 +25,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://elearning.ut.ac.id/*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://elearning.ut.ac.id/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_end"
     }
   ],
@@ -36,8 +39,13 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["lib/pdf.min.js", "lib/pdf.worker.min.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "lib/pdf.min.js",
+        "lib/pdf.worker.min.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "icons": {
@@ -46,4 +54,3 @@
     "128": "icons/icon.png"
   }
 }
-
