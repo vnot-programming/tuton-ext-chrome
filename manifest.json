@@ -44,7 +44,7 @@
         "lib/pdf.worker.min.js"
       ],
       "matches": [
-        "<all_urls>"
+        "https://elearning.ut.ac.id/*"
       ]
     }
   ],
