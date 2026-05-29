@@ -21,9 +21,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const tabMain = document.getElementById('tabMain');
   const tabRat = document.getElementById('tabRat');
   const tabPenilaian = document.getElementById('tabPenilaian');
+  const tabWebcam = document.getElementById('tabWebcam');
   const mainSheet = document.getElementById('mainSheet');
   const ratSheet = document.getElementById('ratSheet');
   const penilaianSheet = document.getElementById('penilaianSheet');
+  const webcamSheet = document.getElementById('webcamSheet');
+  const openRecorderBtn = document.getElementById('openRecorderBtn');
   const pdfUpload = document.getElementById('pdfUpload');
   const pdfStatus = document.getElementById('pdfStatus');
   const pdfInfo = document.getElementById('pdfInfo');
@@ -763,6 +766,23 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     });
   }
 
+  if (tabWebcam) {
+    tabWebcam.addEventListener('click', function () {
+      switchTabSheet('webcam');
+    });
+  }
+
+  if (openRecorderBtn) {
+    openRecorderBtn.addEventListener('click', function () {
+      chrome.windows.create({ 
+        url: 'recorder.html', 
+        type: 'popup', 
+        width: 850, 
+        height: 850 
+      });
+    });
+  }
+
   // PDF upload functionality
   if (pdfUpload) {
     pdfUpload.addEventListener('change', function (event) {
@@ -791,9 +811,11 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     tabMain.classList.remove('active');
     if (tabRat) tabRat.classList.remove('active');
     tabPenilaian.classList.remove('active');
+    if (tabWebcam) tabWebcam.classList.remove('active');
     mainSheet.classList.remove('active');
     if (ratSheet) ratSheet.classList.remove('active');
     penilaianSheet.classList.remove('active');
+    if (webcamSheet) webcamSheet.classList.remove('active');
 
     // Add active class to selected tab and sheet
     if (tabName === 'main') {
@@ -811,7 +833,13 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
       console.log('penilaianSheet display:', window.getComputedStyle(penilaianSheet).display);
 
       // Tab sheet switching successful
+    } else if (tabName === 'webcam') {
+      if (tabWebcam) tabWebcam.classList.add('active');
+      if (webcamSheet) webcamSheet.classList.add('active');
+      console.log('Switched to webcam sheet');
+    }
 
+    if (tabName === 'penilaian') {
       // Ensure text visibility in Penilaian Sheet
       const section = penilaianSheet.querySelector('.section');
       if (section) {
