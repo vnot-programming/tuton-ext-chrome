@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const ratStatus = document.getElementById('ratStatus');
   const clearRAT = document.getElementById('clearRAT');
   const pasteFromClipboard = document.getElementById('pasteFromClipboard');
+  
+  // Dynamic version
+  const appVersionEl = document.getElementById('appVersion');
+  if (appVersionEl && chrome.runtime && chrome.runtime.getManifest) {
+    appVersionEl.textContent = `Using AI • Version ${chrome.runtime.getManifest().version}`;
+  }
 
   // Tab Sheet elements
   const tabMain = document.getElementById('tabMain');
@@ -27,14 +33,48 @@ document.addEventListener('DOMContentLoaded', function () {
   const penilaianSheet = document.getElementById('penilaianSheet');
   const webcamSheet = document.getElementById('webcamSheet');
   const openRecorderBtn = document.getElementById('openRecorderBtn');
-  const pdfUpload = document.getElementById('pdfUpload');
-  const pdfStatus = document.getElementById('pdfStatus');
-  const pdfInfo = document.getElementById('pdfInfo');
-  const pdfFileName = document.getElementById('pdfFileName');
-  const pdfFileSize = document.getElementById('pdfFileSize');
-  const pdfAnalysis = document.getElementById('pdfAnalysis');
-  const pdfResults = document.getElementById('pdfResults');
-  const analyzePDFBtn = document.getElementById('analyzePDF');
+  
+  // Grader Panel elements
+  const graderModeBadge = document.getElementById('graderModeBadge');
+  const graderModeDot = document.getElementById('graderModeDot');
+  const graderModeText = document.getElementById('graderModeText');
+  const graderCourseCode = document.getElementById('graderCourseCode');
+  const graderStudentName = document.getElementById('graderStudentName');
+  const graderStudentNim = document.getElementById('graderStudentNim');
+  const graderStudentEmail = document.getElementById('graderStudentEmail');
+  const graderDueDate = document.getElementById('graderDueDate');
+  const graderAssignName = document.getElementById('graderAssignName');
+  const graderPdfName = document.getElementById('graderPdfName');
+  const graderPdfSize = document.getElementById('graderPdfSize');
+  const graderScoreInput = document.getElementById('graderScoreInput');
+  const graderFeedbackInput = document.getElementById('graderFeedbackInput');
+  const graderGrabBtn = document.getElementById('graderGrabBtn');
+  const graderAnalyzeBtn = document.getElementById('graderAnalyzeBtn');
+  const graderSyncBtn = document.getElementById('graderSyncBtn');
+  const graderStatus = document.getElementById('graderStatus');
+  const graderAcuanInput = document.getElementById('graderAcuanInput');
+  const graderSoalUpload = document.getElementById('graderSoalUpload');
+  const graderSoalStatus = document.getElementById('graderSoalStatus');
+  const graderCopyHtmlBtn = document.getElementById('graderCopyHtmlBtn');
+  const graderSyncHtmlBtn = document.getElementById('graderSyncHtmlBtn');
+  const graderLoading = document.getElementById('graderLoading');
+
+  // CloudConvert panel elements
+  const graderConvertPanel = document.getElementById('graderConvertPanel');
+  const graderMd5Display = document.getElementById('graderMd5Display');
+  const graderMd5CopyBtn = document.getElementById('graderMd5CopyBtn');
+  const graderConvertBtn = document.getElementById('graderConvertBtn');
+  const graderConvertStatus = document.getElementById('graderConvertStatus');
+
+  // Keep compatibility references to prevent exceptions in unresolved handlers
+  const pdfUpload = null;
+  const pdfStatus = graderStatus;
+  const pdfInfo = null;
+  const pdfFileName = null;
+  const pdfFileSize = null;
+  const pdfAnalysis = null;
+  const pdfResults = null;
+  const analyzePDFBtn = null;
 
   // Tab elements initialized
 
@@ -110,35 +150,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const modelOptions = {
     google: [
-      { value: 'auto', label: 'Auto (Gemini 3.1 Flash Lite)' },
-      { value: 'gemini-3.1-flash-preview', label: 'Gemini 3.1 Flash' },
-      { value: 'gemini-3.1-flash-lite-preview', label: 'Gemini 3.1 Flash Lite' },
-      { value: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro' }
+      { value: 'auto', label: 'Auto (Gemini 3.5 Flash)' },
+      { value: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash' },
+      { value: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro' },
+      { value: 'gemini-3.1-flash-live-preview', label: 'Gemini 3.1 Flash Live' },
+      { value: 'gemini-3-flash-preview', label: 'Gemini 3.0 Flash' },
+      { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+      { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite' }
     ],
     openai: [
       { value: 'gpt-4o', label: 'GPT-4o' },
       { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
-      { value: 'gpt-5.4', label: 'GPT-5.4' },
-      { value: 'gpt-5.4-mini', label: 'GPT-5.4 Mini' },
-      { value: 'gpt-5.4-pro', label: 'GPT-5.4 Pro' },
-      { value: 'openai/gpt-oss-120b:free', label: 'GPT-OSS-120B (by OpenRouter)' }
+      { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' }
     ],
     anthropic: [
-      { value: 'claude-haiku-4.5', label: 'Claude Haiku 4.5' },
-      { value: 'claude-opus-4.6', label: 'Claude Opus 4.6' },
-      { value: 'claude-sonnet-4.5', label: 'Claude Sonnet 4.5' }
+      { value: 'claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet' },
+      { value: 'claude-3-5-haiku-latest', label: 'Claude 3.5 Haiku' },
+      { value: 'claude-3-opus-latest', label: 'Claude 3 Opus' }
     ],
     others: [
-      { value: 'deepseek-r1', label: 'DeepSeek-R1' },
-      { value: 'deepseek-v3', label: 'DeepSeek-V3' },
-      { value: 'z-ai/glm-4.5-air:free', label: 'GLM 4.5 Air (by OpenRouter)' },
-      { value: 'glm-5', label: 'GLM-5' },
-      { value: 'inclusionai/ling-2.6-flash:free', label: 'Ling-2.6-flash (by OpenRouter)' },
-      { value: 'llama-3.3', label: 'Llama 3.3' },
-      { value: 'llama-4-maverick', label: 'Llama 4 (Maverick)' },
-      { value: 'minimax/minimax-m2.5:free', label: 'MiniMax M2.5 (by OpenRouter)' },
-      { value: 'mistral-large-3', label: 'Mistral Large 3' },
-      { value: 'qwen-3.5', label: 'Qwen 3.5' }
+      { value: 'openrouter/free', label: 'Auto (OpenRouter Free Router)' },
+      { value: 'meta-llama/llama-3.3-70b-instruct:free', label: 'Llama 3.3 70B (Free)' },
+      { value: 'deepseek/deepseek-v4-flash:free', label: 'DeepSeek V4 Flash (Free)' },
+      { value: 'qwen/qwen3-coder:free', label: 'Qwen 3 Coder (Free)' },
+      { value: 'qwen/qwen3-next-80b-a3b-instruct:free', label: 'Qwen 3 Next 80B (Free)' },
+      { value: 'meta-llama/llama-3.2-3b-instruct:free', label: 'Llama 3.2 3B (Free)' },
+      { value: 'minimax/minimax-m2.5:free', label: 'MiniMax M2.5 (Free)' },
+      { value: 'openai/gpt-oss-120b:free', label: 'GPT OSS 120B (Free)' },
+      { value: 'z-ai/glm-4.5-air:free', label: 'GLM 4.5 Air (Free)' },
+      { value: 'nousresearch/hermes-3-llama-3.1-405b:free', label: 'Hermes 3 Llama 3.1 405B (Free)' }
     ]
   };
 
@@ -154,9 +194,42 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Load saved settings
-  chrome.storage.sync.get(['selectedProvider', 'selectedModel', 'customApiKey', 'deskripsiMataKuliah', 'capaianPembelajaran'], function (result) {
-    const defaultProvider = result.selectedProvider || 'google';
+  // Parse .env keys
+  async function loadEnvKeys() {
+    try {
+      const response = await fetch(chrome.runtime.getURL('.env'));
+      if (response.ok) {
+        const text = await response.text();
+        const keys = {};
+        text.split('\n').forEach(line => {
+          const eqIdx = line.indexOf('=');
+          if (eqIdx === -1) return;
+          const key = line.slice(0, eqIdx).trim().toLowerCase();
+          // Join everything after the first '=' (handles values with '=' like JWTs)
+          let val = line.slice(eqIdx + 1).trim();
+          // Strip surrounding quotes (single or double) added by the user
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1).trim();
+          }
+          // Strip trailing dots/slashes from URL values
+          val = val.replace(/[./\r]+$/, '');
+          if (key && val) keys[key] = val;
+        });
+        return keys;
+      }
+    } catch (e) {
+      console.log('No .env file found or accessible. Fallback to manual.');
+    }
+    return null;
+  }
+
+  // Load saved settings & .env fallbacks
+  chrome.storage.sync.get([
+    'selectedProvider', 'selectedModel', 
+    'googleApiKey', 'othersApiKey', 'openaiApiKey', 'anthropicApiKey',
+    'deskripsiMataKuliah', 'capaianPembelajaran', 'graderAcuanInput'
+  ], async function (result) {
+    const defaultProvider = result.selectedProvider || 'others';
     if (aiProviderSelect) aiProviderSelect.value = defaultProvider;
 
     updateModelList(defaultProvider);
@@ -166,18 +239,105 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       aiModelSelect.value = 'auto'; // Default to auto
     }
-    if (result.customApiKey) {
-      customApiKeyInput.value = result.customApiKey;
+
+    // Try loading keys from .env
+    const envKeys = await loadEnvKeys();
+    const keysToStore = {};
+
+    // Store CloudConvert sandbox API key & endpoint from .env
+    if (envKeys && envKeys.cloudconvert_key_sandbox) {
+      keysToStore.cloudconvertKeySandbox = envKeys.cloudconvert_key_sandbox.trim();
     }
+    if (envKeys && envKeys.cloudconvert_api_sandbox) {
+      // Strip trailing dot if present
+      keysToStore.cloudconvertApiSandbox = envKeys.cloudconvert_api_sandbox.trim().replace(/\.$/, '');
+    }
+
+    let googleKey = result.googleApiKey;
+    if (!googleKey && envKeys && envKeys.gemini_key) {
+      googleKey = envKeys.gemini_key;
+      keysToStore.googleApiKey = googleKey;
+    }
+
+    let othersKey = result.othersApiKey;
+    if (!othersKey && envKeys) {
+      othersKey = envKeys.others_key || envKeys.api_key;
+      keysToStore.othersApiKey = othersKey;
+    }
+
+    let openaiKey = result.openaiApiKey;
+    if (!openaiKey && envKeys && envKeys.openai_key) {
+      openaiKey = envKeys.openai_key;
+      keysToStore.openaiApiKey = openaiKey;
+    }
+
+    let anthropicKey = result.anthropicApiKey;
+    if (!anthropicKey && envKeys && envKeys.anthropic_key) {
+      anthropicKey = envKeys.anthropic_key;
+      keysToStore.anthropicApiKey = anthropicKey;
+    }
+
+    if (Object.keys(keysToStore).length > 0) {
+      chrome.storage.sync.set(keysToStore);
+    }
+
+    // Set value of key input based on active provider
+    if (defaultProvider === 'google') {
+      customApiKeyInput.value = googleKey || '';
+    } else if (defaultProvider === 'others') {
+      customApiKeyInput.value = othersKey || '';
+    } else if (defaultProvider === 'openai') {
+      customApiKeyInput.value = openaiKey || '';
+    } else if (defaultProvider === 'anthropic') {
+      customApiKeyInput.value = anthropicKey || '';
+    }
+
     if (result.deskripsiMataKuliah) {
       deskripsiMataKuliah.value = result.deskripsiMataKuliah;
     }
     if (result.capaianPembelajaran) {
       capaianPembelajaran.value = result.capaianPembelajaran;
     }
+
+    const defaultAcuanPenilaian = `1. Berikan skor nilai dalam rentang 1 hingga 100 untuk setiap jawaban mahasiswa, dengan melakukan evaluasi terhadap tiga aspek utama: ketepatan jawaban terhadap materi soal, kelengkapan jawaban sesuai dengan persyaratan soal diskusi, dan kedalaman pemahaman mahasiswa terhadap materi yang diujikan.
+
+2. Lakukan pengecekan pelanggaran akademik secara menyeluruh pada seluruh pekerjaan mahasiswa dengan memenuhi semua kriteria verifikasi berikut:
+- Deteksi adanya kesamaan pola jawaban yang identik atau hampir identik antara satu mahasiswa dengan mahasiswa lain untuk mengidentifikasi praktik plagiarisme
+- Analisis penggunaan pola bahasa Agentic AI pada jawaban yang dikumpulkan, guna mengidentifikasi apakah mahasiswa menggunakan bantuan agen AI dalam mengerjakan tugas
+- Verifikasi bahwa seluruh implementasi kode yang dibuat dalam jawaban hanya menggunakan bahasa pemrograman R, tanpa ada penggunaan bahasa pemrograman lain yang tidak diizinkan
+
+3. Berikan skor nilai 0 untuk setiap mahasiswa yang terbukti melakukan salah satu atau lebih pelanggaran akademik yang tercantum di atas. Sertakan bukti deteksi pelanggaran yang jelas dan terperinci untuk setiap kasus pelanggaran yang ditemukan.
+
+4. Gunakan format penulisan dengan sudut pandang "Orang Pertama" yang memberikan nasihat konstruktif kepada setiap mahasiswa dalam laporan penilaian.`;
+
+    if (graderAcuanInput) {
+      graderAcuanInput.value = result.graderAcuanInput !== undefined ? result.graderAcuanInput : defaultAcuanPenilaian;
+    }
+
+    // Disable feedback inputs on startup until evaluated or retrieved
+    setFeedbackFieldsDisabled(true);
+
     updateApiKeySection();
     updateRATContent(); // Update RAT content after loading
+    autoLoadGraderInfo(); // Load Moodle Grader info
   });
+
+  // Helper to enable or disable feedback inputs
+  function setFeedbackFieldsDisabled(disabled) {
+    if (graderScoreInput) graderScoreInput.disabled = disabled;
+    if (graderFeedbackInput) graderFeedbackInput.disabled = disabled;
+    if (graderSyncBtn) graderSyncBtn.disabled = disabled;
+    if (graderSyncHtmlBtn) graderSyncHtmlBtn.disabled = disabled;
+    if (graderCopyHtmlBtn) graderCopyHtmlBtn.disabled = disabled;
+    
+    // Style adjustments for visual cue
+    const op = disabled ? '0.5' : '1';
+    if (graderScoreInput) graderScoreInput.style.opacity = op;
+    if (graderFeedbackInput) graderFeedbackInput.style.opacity = op;
+    if (graderSyncBtn) graderSyncBtn.style.opacity = op;
+    if (graderSyncHtmlBtn) graderSyncHtmlBtn.style.opacity = op;
+    if (graderCopyHtmlBtn) graderCopyHtmlBtn.style.opacity = op;
+  }
 
   // Auto extract text when popup opens
   autoExtractText();
@@ -185,10 +345,24 @@ document.addEventListener('DOMContentLoaded', function () {
   // Handle provider selection change
   if (aiProviderSelect) {
     aiProviderSelect.addEventListener('change', function () {
-      updateModelList(this.value);
-      aiModelSelect.value = modelOptions[this.value][0].value;
+      const provider = this.value;
+      updateModelList(provider);
+      aiModelSelect.value = modelOptions[provider][0].value;
       updateApiKeySection();
-      chrome.storage.sync.set({ selectedProvider: this.value, selectedModel: aiModelSelect.value });
+
+      // Retrieve correct isolated key and set it
+      chrome.storage.sync.get(['googleApiKey', 'othersApiKey', 'openaiApiKey', 'anthropicApiKey'], function (keysResult) {
+        if (provider === 'google') {
+          customApiKeyInput.value = keysResult.googleApiKey || '';
+        } else if (provider === 'others') {
+          customApiKeyInput.value = keysResult.othersApiKey || '';
+        } else if (provider === 'openai') {
+          customApiKeyInput.value = keysResult.openaiApiKey || '';
+        } else if (provider === 'anthropic') {
+          customApiKeyInput.value = keysResult.anthropicApiKey || '';
+        }
+        chrome.storage.sync.set({ selectedProvider: provider, selectedModel: aiModelSelect.value });
+      });
     });
   }
 
@@ -200,9 +374,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Handle custom API key input
+  // Handle isolated custom API key input
   customApiKeyInput.addEventListener('input', function () {
-    chrome.storage.sync.set({ customApiKey: customApiKeyInput.value });
+    const provider = aiProviderSelect.value;
+    const keyVal = customApiKeyInput.value.trim();
+    const saveObj = {};
+    if (provider === 'google') {
+      saveObj.googleApiKey = keyVal;
+    } else if (provider === 'others') {
+      saveObj.othersApiKey = keyVal;
+    } else if (provider === 'openai') {
+      saveObj.openaiApiKey = keyVal;
+    } else if (provider === 'anthropic') {
+      saveObj.anthropicApiKey = keyVal;
+    }
+    chrome.storage.sync.set(saveObj);
   });
 
   // Handle RAT input changes
@@ -231,6 +417,80 @@ document.addEventListener('DOMContentLoaded', function () {
   capaianPembelajaran.addEventListener('blur', function () {
     this.style.borderColor = 'rgba(255,255,255,0.3)';
   });
+
+  // Handle Rubrik (graderAcuanInput) events
+  if (graderAcuanInput) {
+    graderAcuanInput.addEventListener('input', function () {
+      chrome.storage.sync.set({ graderAcuanInput: graderAcuanInput.value });
+    });
+    graderAcuanInput.addEventListener('focus', function () {
+      this.style.borderColor = 'rgba(46, 139, 87, 0.7)';
+      this.style.boxShadow = '0 0 5px rgba(46, 139, 87, 0.5)';
+      this.style.outline = 'none';
+    });
+    graderAcuanInput.addEventListener('blur', function () {
+      this.style.borderColor = '';
+      this.style.boxShadow = '';
+    });
+  }
+
+  // Handle PDF Questions Upload for Rubrik
+  if (graderSoalUpload) {
+    graderSoalUpload.addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+        showStatus('Error: Berkas harus berupa file PDF.', 'error', graderSoalStatus);
+        graderSoalUpload.value = '';
+        return;
+      }
+
+      showStatus('Membaca berkas PDF...', 'info', graderSoalStatus);
+
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        try {
+          const arrayBuffer = e.target.result;
+          
+          // Configure worker
+          if (typeof pdfjsLib !== 'undefined') {
+            window.pdfjsLib = pdfjsLib;
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('lib/pdf.worker.min.js');
+          } else if (!window.pdfjsLib) {
+            throw new Error('PDF.js library tidak termuat.');
+          }
+
+          const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+          let fullText = '';
+          
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + '\n';
+          }
+
+          if (fullText.trim()) {
+            if (graderAcuanInput) {
+              graderAcuanInput.value = fullText;
+              chrome.storage.sync.set({ graderAcuanInput: fullText });
+            }
+            showStatus('Teks soal berhasil dimuat sebagai acuan penilaian!', 'success', graderSoalStatus);
+          } else {
+            showStatus('Error: PDF tidak memiliki teks yang bisa diekstrak.', 'error', graderSoalStatus);
+          }
+        } catch (error) {
+          console.error('Error parsing PDF:', error);
+          showStatus('Gagal membaca PDF: ' + error.message, 'error', graderSoalStatus);
+        }
+      };
+      reader.onerror = function () {
+        showStatus('Gagal membaca berkas.', 'error', graderSoalStatus);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
 
   // Handle clear button
   clearRAT.addEventListener('click', function () {
@@ -401,6 +661,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (response.success) {
           let finalAnswer = response.answer;
           
+          // Purge em-dash character completely to prevent rendering errors
+          finalAnswer = finalAnswer.replace(/—/g, '-');
+          
           // 1. Coba cari tag <balasan> (prioritas utama)
           const balasanMatch = finalAnswer.match(/<balasan>([\s\S]*?)<\/balasan>/i);
           if (balasanMatch) {
@@ -515,7 +778,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function to call AI API based on selected provider and model
-  async function callAIAPI(apiKey, model, text, provider = 'google') {
+  async function callAIAPI(apiKey, model, text, provider = 'google', pdfBase64 = null, mimeType = 'application/pdf') {
     // Menentukan waktu berdasarkan jam komputer saat ini
     const hour = new Date().getHours();
     let waktuSekarang = "pagi";
@@ -563,12 +826,13 @@ ${text}`;
 18. PENTING: Waktu komputer saat ini adalah ${waktuSekarang}. Jika Anda mengawali atau membalas ucapan salam waktu (seperti selamat pagi/siang/sore/malam), Anda WAJIB menggunakan sapaan "Selamat ${waktuSekarang}", tanpa terpengaruh oleh salam waktu yang ditulis mahasiswa di postingannya.
 19. SANGAT PENTING: JANGAN PERNAH memperkenalkan diri atau menggunakan teks *placeholder* seperti "[Nama Tutor/Dosen]". Nama akun Anda sudah otomatis terlihat di forum, jadi langsung saja masuk ke isi pembahasan dan jangan menuliskan nama pengirim di akhir pesan.
 20. ATURAN FINAL SANGAT PENTING: Anda WAJIB membungkus hasil akhir teks balasan Anda secara eksklusif di dalam tag <balasan> dan </balasan>. Segala proses berpikir atau draf yang Anda buat harus berada di luar tag tersebut.
+21. SANGAT PENTING: JANGAN SEKALI-KALI menggunakan karakter em-dash (—) di dalam seluruh teks balasan Anda. Selalu gunakan tanda hubung standar (-) jika diperlukan.
 
 Tulis respons seperti teman yang sedang membantu di forum:`;
 
     try {
       if (provider === 'google') {
-        return await callGoogleAPI(apiKey, model, prompt);
+        return await callGoogleAPI(apiKey, model, prompt, pdfBase64, mimeType);
       } else if (provider === 'openai') {
         return await callOpenAIAPI(apiKey, model, prompt);
       } else if (provider === 'anthropic') {
@@ -576,7 +840,7 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
       } else if (provider === 'others') {
         return await callOthersAPI(apiKey, model, prompt);
       } else {
-        return await callGoogleAPI(apiKey, model, prompt);
+        return await callGoogleAPI(apiKey, model, prompt, pdfBase64, mimeType);
       }
     } catch (error) {
       return {
@@ -586,15 +850,25 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     }
   }
 
-  // API Fetch implementation based on provider
-  async function callGoogleAPI(apiKey, model, prompt) {
-    let modelName = model === 'auto' ? 'gemini-3.1-flash-lite-preview' : model;
+  async function callGoogleAPI(apiKey, model, prompt, pdfBase64 = null, mimeType = 'application/pdf') {
+    let modelName = model === 'auto' ? 'gemini-3.5-flash' : model;
+
+    const parts = [];
+    if (pdfBase64) {
+      parts.push({
+        inlineData: {
+          mimeType: mimeType,
+          data: pdfBase64
+        }
+      });
+    }
+    parts.push({ text: prompt });
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
+        contents: [{ parts: parts }]
       })
     });
 
@@ -873,222 +1147,659 @@ Tulis respons seperti teman yang sedang membantu di forum:`;
     }
   }
 
-  // PDF upload handling function
-  async function handlePDFUpload(event) {
-    const file = event.target.files[0];
+  // --- Moodle Grader Engine & Simulation Mode ---
+  
+  let isSimulationMode = true;
+  let currentGraderData = null;
+  
+  // Default simulation data matching user profile and requirements
+  const simulationData = {
+    courseCode: 'STIK4111.12',
+    assignmentName: 'Tugas.1',
+    studentName: 'PRASTIANO NOER ADITYA',
+    studentNim: '042070105',
+    studentEmail: '042070105@ecampus.ut.ac.id',
+    dueDate: '11 May 2026, 3:00 PM',
+    currentGrade: '85',
+    currentFeedback: '',
+    submissionPdfName: 'Tugas 1 Dasar Pemrograman R Prastiano Noer Aditya.pdf',
+    submissionPdfUrl: '',
+    submissionPdfText: `TUGAS 1 - DASAR PEMROGRAMAN R
+Nama: PRASTIANO NOER ADITYA
+NIM: 042070105
+Mata Kuliah: STIK4111.12
 
-    if (!file) {
-      return;
+Jawaban Soal 1:
+Dalam bahasa pemrograman R, struktur data vektor merupakan objek dasar yang menyimpan elemen-elemen dengan tipe data yang sama. Vektor dapat dibuat menggunakan fungsi c(). Contohnya, x <- c(1, 2, 3, 4, 5).
+
+Jawaban Soal 2:
+Analisis deskriptif menggunakan data frame df dilakukan dengan fungsi summary(df). Fungsi ini menampilkan nilai minimum, kuartil pertama, median, mean, kuartil ketiga, dan nilai maksimum untuk setiap kolom numerik.
+
+Referensi:
+1. Kabacoff, R. I. (2020). R in Action: Data Analysis and Graphics with R. Manning Publications.
+2. Wickham, H., & Grolemund, G. (2017). R for Data Science. O'Reilly Media.`
+  };
+
+  // Load grader data to popup UI elements
+  function loadGraderUI(data, isSimulated) {
+    isSimulationMode = isSimulated;
+    currentGraderData = data;
+    
+    // Update Badge
+    if (graderModeBadge && graderModeDot && graderModeText) {
+      if (isSimulated) {
+        graderModeBadge.className = 'badgePremium simulated';
+        graderModeDot.className = 'dotActive simulated';
+        graderModeText.textContent = 'Mode Simulasi';
+      } else {
+        graderModeBadge.className = 'badgePremium';
+        graderModeDot.className = 'dotActive';
+        graderModeText.textContent = 'Moodle Grader';
+      }
+    }
+    
+    // Update texts
+    if (graderCourseCode) graderCourseCode.textContent = data.courseCode || '-';
+    if (graderStudentName) graderStudentName.textContent = data.studentName || '-';
+    if (graderStudentNim) graderStudentNim.textContent = data.studentNim || '-';
+    if (graderStudentEmail) graderStudentEmail.textContent = data.studentEmail || '-';
+    if (graderDueDate) graderDueDate.textContent = data.dueDate || '-';
+    if (graderAssignName) graderAssignName.textContent = data.assignmentName || '-';
+    
+    // PDF Info
+    if (graderPdfName) {
+      graderPdfName.textContent = data.submissionPdfName || 'Tidak ada file PDF terlampir';
+    }
+    if (graderPdfSize) {
+      graderPdfSize.textContent = data.submissionPdfName ? '' : '';
     }
 
-    if (file.type !== 'application/pdf') {
-      showStatus('Please select a PDF file', 'error', pdfStatus);
-      return;
+    // CloudConvert .pages / .docx detection
+    const fileName = (data.submissionPdfName || '').toLowerCase();
+    const isConvertible = fileName.endsWith('.pages') || fileName.endsWith('.docx');
+    if (graderConvertPanel) {
+      if (isConvertible && data.submissionPdfUrl) {
+        graderConvertPanel.style.display = 'block';
+        // Compute MD5 hash of the file in background
+        computeFileMd5(data.submissionPdfUrl);
+      } else {
+        graderConvertPanel.style.display = 'none';
+        if (graderMd5Display) graderMd5Display.value = '-';
+      }
     }
+    
+    // Inputs
+    if (graderScoreInput) graderScoreInput.value = data.currentGrade || '0';
+    if (graderFeedbackInput) {
+      const studentName = data.studentName || 'Mahasiswa';
+      graderFeedbackInput.value = data.currentFeedback || `Halo, ${studentName}`;
+    }
+  }
 
+  // CloudConvert: compute MD5 hash of remote file binary
+  async function computeFileMd5(url) {
+    if (graderMd5Display) {
+      graderMd5Display.value = 'Menghitung...';
+    }
     try {
-      showStatus('Processing PDF file...', 'info', pdfStatus);
+      const res = await new Promise((resolve) => {
+        chrome.runtime.sendMessage({ action: 'backgroundFetchBinary', url: url }, resolve);
+      });
+      if (!res || !res.success) throw new Error(res?.error || 'Gagal mengunduh berkas');
 
-      // Store file info
-      uploadedPDF = {
-        file: file,
-        name: file.name,
-        size: file.size,
-        text: null
-      };
+      // Decode base64 to binary string
+      const binaryString = atob(res.base64);
 
-      // Display file info
-      displayPDFInfo();
+      // Compute MD5 via robust pure JS
+      const md5 = computeMD5(binaryString);
+      if (graderMd5Display) graderMd5Display.value = md5;
 
-      // Extract text from PDF
-      const text = await extractTextFromPDF(file);
-      uploadedPDF.text = text;
-
-      showStatus('PDF processed successfully!', 'success', pdfStatus);
-      pdfAnalysis.style.display = 'block';
-
-    } catch (error) {
-      console.error('Error processing PDF:', error);
-      showStatus('Error processing PDF: ' + error.message, 'error', pdfStatus);
+      // Store the base64 for later conversion
+      graderConvertPanel._pagesBase64 = res.base64;
+      graderConvertPanel._pagesUrl = url;
+    } catch (err) {
+      if (graderMd5Display) graderMd5Display.value = 'Gagal: ' + err.message;
     }
   }
 
-  // Display PDF info
-  function displayPDFInfo() {
-    if (!uploadedPDF) {
-      pdfInfo.style.display = 'none';
-      return;
+  // ─── Pure-JS MD5 implementation (RFC 1321) ──────────────────────────────────
+  function computeMD5(string) {
+    function md5cycle(x, k) {
+      let a = x[0], b = x[1], c = x[2], d = x[3];
+      a = ff(a, b, c, d, k[0], 7, -680876936); d = ff(d, a, b, c, k[1], 12, -389564586); c = ff(c, d, a, b, k[2], 17,  606105819); b = ff(b, c, d, a, k[3], 22, -1044525330);
+      a = ff(a, b, c, d, k[4], 7, -176418897); d = ff(d, a, b, c, k[5], 12,  1200080426); c = ff(c, d, a, b, k[6], 17, -1473231341); b = ff(b, c, d, a, k[7], 22, -45705983);
+      a = ff(a, b, c, d, k[8], 7,  1770035416); d = ff(d, a, b, c, k[9], 12, -1958414417); c = ff(c, d, a, b, k[10], 17, -42063); b = ff(b, c, d, a, k[11], 22, -1990404162);
+      a = ff(a, b, c, d, k[12], 7,  1804603682); d = ff(d, a, b, c, k[13], 12, -40341101); c = ff(c, d, a, b, k[14], 17, -1502002290); b = ff(b, c, d, a, k[15], 22,  1236535329);
+      a = gg(a, b, c, d, k[1], 5, -165796510); d = gg(d, a, b, c, k[6], 9, -1069501632); c = gg(c, d, a, b, k[11], 14,  643717713); b = gg(b, c, d, a, k[0], 20, -373897302);
+      a = gg(a, b, c, d, k[5], 5, -701558691); d = gg(d, a, b, c, k[10], 9,  38016083); c = gg(c, d, a, b, k[15], 14, -660478335); b = gg(b, c, d, a, k[4], 20, -405537848);
+      a = gg(a, b, c, d, k[9], 5,  568446438); d = gg(d, a, b, c, k[14], 9, -1019803690); c = gg(c, d, a, b, k[3], 14, -187363961); b = gg(b, c, d, a, k[8], 20,  1163531501);
+      a = gg(a, b, c, d, k[13], 5, -1444681467); d = gg(d, a, b, c, k[2], 9, -51403784); c = gg(c, d, a, b, k[7], 14,  1735328473); b = gg(b, c, d, a, k[12], 20, -1926607734);
+      a = hh(a, b, c, d, k[5], 4, -378558); d = hh(d, a, b, c, k[8], 11, -2022574463); c = hh(c, d, a, b, k[11], 16,  1839030562); b = hh(b, c, d, a, k[14], 23, -35309556);
+      a = hh(a, b, c, d, k[1], 4, -1530992060); d = hh(d, a, b, c, k[4], 11,  1272893353); c = hh(c, d, a, b, k[7], 16, -155497632); b = hh(b, c, d, a, k[10], 23, -1094730640);
+      a = hh(a, b, c, d, k[13], 4,  681279174); d = hh(d, a, b, c, k[0], 11, -358537222); c = hh(c, d, a, b, k[3], 16, -722521979); b = hh(b, c, d, a, k[6], 23,  76029189);
+      a = hh(a, b, c, d, k[9], 4, -640364487); d = hh(d, a, b, c, k[12], 11, -421815835); c = hh(c, d, a, b, k[15], 16,  530742520); b = hh(b, c, d, a, k[2], 23, -995338651);
+      a = ii(a, b, c, d, k[0], 6, -198630844); d = ii(d, a, b, c, k[7], 10,  1126891415); c = ii(c, d, a, b, k[14], 15, -1416354905); b = ii(b, c, d, a, k[5], 21, -57434055);
+      a = ii(a, b, c, d, k[12], 6,  1700485571); d = ii(d, a, b, c, k[3], 10, -1894986606); c = ii(c, d, a, b, k[10], 15, -1051523); b = ii(b, c, d, a, k[1], 21, -2054922799);
+      a = ii(a, b, c, d, k[8], 6,  1873313359); d = ii(d, a, b, c, k[15], 10, -30611744); c = ii(c, d, a, b, k[6], 15, -1560198380); b = ii(b, c, d, a, k[13], 21,  1309151649);
+      a = ii(a, b, c, d, k[4], 6, -145523070); d = ii(d, a, b, c, k[11], 10, -1120210379); c = ii(c, d, a, b, k[2], 15,  718787259); b = ii(b, c, d, a, k[9], 21, -343485551);
+      x[0] = add32(a, x[0]); x[1] = add32(b, x[1]); x[2] = add32(c, x[2]); x[3] = add32(d, x[3]);
+    }
+    function cmn(q, a, b, x, s, t) { a = add32(add32(a, q), add32(x, t)); return add32((a << s) | (a >>> (32 - s)), b); }
+    function ff(a, b, c, d, x, s, t) { return cmn((b & c) | ((~b) & d), a, b, x, s, t); }
+    function gg(a, b, c, d, x, s, t) { return cmn((b & d) | (c & (~d)), a, b, x, s, t); }
+    function hh(a, b, c, d, x, s, t) { return cmn(b ^ c ^ d, a, b, x, s, t); }
+    function ii(a, b, c, d, x, s, t) { return cmn(c ^ (b | (~d)), a, b, x, s, t); }
+    function add32(a, b) { return (a + b) & 0xFFFFFFFF; }
+    
+    var n = string.length, state = [1732584193, -271733879, -1732584194, 271733878], i;
+    for (i = 64; i <= string.length; i += 64) {
+      var k = [];
+      for (let j = 0; j < 64; j += 4) {
+        k.push((string.charCodeAt(i - 64 + j) & 0xFF) | ((string.charCodeAt(i - 64 + j + 1) & 0xFF) << 8) | ((string.charCodeAt(i - 64 + j + 2) & 0xFF) << 16) | ((string.charCodeAt(i - 64 + j + 3) & 0xFF) << 24));
+      }
+      md5cycle(state, k);
+    }
+    string = string.substring(i - 64);
+    var tail = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+    for (i = 0; i < string.length; i++) tail[i >> 2] |= (string.charCodeAt(i) & 0xFF) << ((i % 4) << 3);
+    tail[i >> 2] |= 0x80 << ((i % 4) << 3);
+    if (i > 55) {
+      md5cycle(state, tail);
+      for (i = 0; i < 16; i++) tail[i] = 0;
+    }
+    tail[14] = n * 8;
+    md5cycle(state, tail);
+    var hex = '';
+    for (i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        hex += ((state[i] >> (j * 8)) & 0xFF).toString(16).padStart(2, '0');
+      }
+    }
+    return hex;
+  }
+
+  // CloudConvert .pages -> PDF conversion (all API calls run via background.js)
+  async function convertPagesFileToPdf() {
+    const base64 = graderConvertPanel._pagesBase64;
+    const pagesFilename = (currentGraderData && currentGraderData.submissionPdfName) || 'tugas.pages';
+
+    if (!base64) {
+      showStatus('Berkas .pages belum siap. Tunggu sebentar atau coba Ambil Ulang.', 'error', graderConvertStatus || graderStatus);
+      return null;
     }
 
-    pdfFileName.textContent = uploadedPDF.name;
-    pdfFileSize.textContent = `Size: ${formatFileSize(uploadedPDF.size)}`;
-    pdfInfo.style.display = 'block';
-  }
+    return new Promise((resolve) => {
+      chrome.storage.sync.get(['cloudconvertKeySandbox', 'cloudconvertApiSandbox'], (keys) => {
+        const apiKey = keys.cloudconvertKeySandbox;
+        // Strip trailing dots and slashes that may come from .env value
+        const apiBase = (keys.cloudconvertApiSandbox || 'https://api.sandbox.cloudconvert.com')
+          .trim().replace(/[./]+$/, '');
 
-  // Format file size
-  function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  // Extract text from uploaded PDF
-  async function extractTextFromPDF(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = async function (e) {
-        try {
-          const arrayBuffer = e.target.result;
-
-          // Load PDF.js library if not already loaded
-          if (!window.pdfjsLib) {
-            await loadPDFJS();
-          }
-
-          // Load PDF using PDF.js
-          const pdf = await window.pdfjsLib.getDocument(arrayBuffer).promise;
-          console.log('PDF loaded, pages:', pdf.numPages);
-
-          let fullText = '';
-
-          // Iterate through each page to extract text
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(' ');
-            fullText += pageText + '\n';
-          }
-
-          resolve(fullText);
-        } catch (error) {
-          reject(error);
+        if (!apiKey) {
+          showStatus('CloudConvert API Key tidak ditemukan di .env', 'error', graderConvertStatus || graderStatus);
+          resolve(null);
+          return;
         }
-      };
 
-      reader.onerror = function () {
-        reject(new Error('Failed to read PDF file'));
-      };
+        if (graderConvertBtn) graderConvertBtn.disabled = true;
+        showStatus('Mengirim ke CloudConvert... (proses 30-60 detik)', 'info', graderConvertStatus || graderStatus);
 
-      reader.readAsArrayBuffer(file);
+        // Delegate ENTIRE workflow to background.js service worker
+        // (popup context cannot make cross-origin fetch to CloudConvert)
+        chrome.runtime.sendMessage({
+          action: 'cloudconvertConvert',
+          apiKey: apiKey,
+          apiBase: apiBase,
+          base64: base64,
+          filename: pagesFilename
+        }, (res) => {
+          if (graderConvertBtn) graderConvertBtn.disabled = false;
+
+          if (!res || !res.success) {
+            const errMsg = res ? res.error : 'Tidak ada respons dari background worker';
+            showStatus('Gagal konversi: ' + errMsg, 'error', graderConvertStatus || graderStatus);
+            resolve(null);
+            return;
+          }
+
+          showStatus('Konversi selesai! File PDF siap dievaluasi.', 'success', graderConvertStatus || graderStatus);
+
+          // Store the converted PDF base64 into graderData so evaluation picks it up
+          if (currentGraderData) {
+            currentGraderData.submissionPdfName = pagesFilename.replace(/\.(pages|docx)$/i, '.pdf');
+            currentGraderData._convertedPdfBase64 = res.base64;
+          }
+          if (graderPdfName) graderPdfName.textContent = pagesFilename.replace(/\.(pages|docx)$/i, '.pdf') + ' (terkonversi)';
+          if (graderConvertPanel) graderConvertPanel.style.display = 'none';
+
+          resolve(res.base64);
+        });
+      });
     });
   }
 
-  // Analyze uploaded PDF
-  async function analyzeUploadedPDF() {
-    if (!uploadedPDF || !uploadedPDF.text) {
-      showStatus('Please upload a PDF file first', 'error', pdfStatus);
-      return;
-    }
 
-    try {
-      showStatus('Analyzing PDF...', 'info', pdfStatus);
-      analyzePDFBtn.disabled = true;
+  // Handle Convert Button Click
+  if (graderConvertBtn) {
+    graderConvertBtn.addEventListener('click', async function () {
+      await convertPagesFileToPdf();
+    });
+  }
 
+  // Handle MD5 Copy Button Click
+  if (graderMd5CopyBtn) {
+    graderMd5CopyBtn.addEventListener('click', function () {
+      const md5 = graderMd5Display ? graderMd5Display.value.trim() : '';
+      if (md5 && md5 !== '-' && !md5.startsWith('Gagal') && !md5.startsWith('Menghi')) {
+        navigator.clipboard.writeText(md5).then(() => {
+          const orig = graderMd5CopyBtn.textContent;
+          graderMd5CopyBtn.textContent = '✅ Disalin!';
+          setTimeout(() => { graderMd5CopyBtn.textContent = orig; }, 2000);
+        }).catch(() => {
+          showStatus('Gagal menyalin ke clipboard.', 'error', graderStatus);
+        });
+      } else {
+        showStatus('MD5 belum siap. Tunggu proses hash selesai.', 'info', graderStatus);
+      }
+    });
+  }
+
+  // Scrape page or fallback to Simulation
+  function autoLoadGraderInfo() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      if (!tabs || !tabs[0] || !tabs[0].url) {
+        loadGraderUI(simulationData, true);
+        return;
+      }
+      
+      const url = tabs[0].url;
+      // Check if it's Moodle grader page
+      const isGraderPage = url.includes('elearning.ut.ac.id') && url.includes('action=grader');
+      if (isGraderPage) {
+        showStatus('Membaca halaman Moodle...', 'info', graderStatus);
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'grabGraderInfo' }, function (response) {
+          if (chrome.runtime.lastError || !response || !response.success) {
+            console.log('Failing back to simulation mode');
+            loadGraderUI(simulationData, true);
+          } else {
+            console.log('Successfully grabbed Moodle Grader info:', response.info);
+            // If scraped data is mostly empty, use simulation fallback
+            if (!response.info.studentName) {
+              loadGraderUI(simulationData, true);
+            } else {
+              loadGraderUI(response.info, false);
+              showStatus('Data Moodle berhasil dimuat!', 'success', graderStatus);
+            }
+          }
+        });
+      } else {
+        console.log('Not on grader page. Activating Simulation Mode.');
+        loadGraderUI(simulationData, true);
+      }
+    });
+  }
+
+  // Handle reload button click
+  if (graderGrabBtn) {
+    graderGrabBtn.addEventListener('click', function () {
+      setFeedbackFieldsDisabled(false);
+      autoLoadGraderInfo();
+    });
+  }
+
+  // Converter function: plain text / markdown to clean HTML paragraphs
+  function convertFeedbackToHtml(text) {
+    if (!text) return '';
+    
+    // Split into paragraphs by double newlines
+    let paragraphs = text.split(/\n\n+/);
+    let htmlParagraphs = paragraphs.map(p => {
+      let trimmed = p.trim();
+      if (!trimmed) return '';
+      
+      // Convert single newlines inside paragraph to <br>
+      let formatted = trimmed.replace(/\n/g, '<br>');
+      
+      // Convert Markdown **bold** to <strong>bold</strong>
+      formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      
+      // Convert Markdown *italic* to <em>italic</em>
+      formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      
+      // Convert basic Markdown list items starting with "-" or "*"
+      if (formatted.startsWith('- ') || formatted.startsWith('* ')) {
+        let items = formatted.split(/(?:\r?\n|^- |^\* )+/m);
+        items = items.map(item => item.trim()).filter(Boolean);
+        let listHtml = '<ul>' + items.map(item => `<li>${item}</li>`).join('') + '</ul>';
+        return listHtml;
+      }
+      
+      return `<p>${formatted}</p>`;
+    }).filter(Boolean);
+    
+    return htmlParagraphs.join('\n');
+  }
+
+  // Handle Copy HTML Button Click
+  if (graderCopyHtmlBtn) {
+    graderCopyHtmlBtn.addEventListener('click', function () {
+      const feedbackText = graderFeedbackInput.value.trim();
+      const htmlFeedback = convertFeedbackToHtml(feedbackText);
+      
+      if (htmlFeedback) {
+        navigator.clipboard.writeText(htmlFeedback).then(function () {
+          showStatus('HTML copied to clipboard!', 'success', graderStatus);
+          const originalText = graderCopyHtmlBtn.textContent;
+          graderCopyHtmlBtn.textContent = '✅ Copied!';
+          setTimeout(() => {
+            graderCopyHtmlBtn.textContent = originalText;
+          }, 2000);
+        }).catch(function (err) {
+          showStatus('Failed to copy HTML: ' + err, 'error', graderStatus);
+        });
+      } else {
+        showStatus('Umpan balik kosong!', 'error', graderStatus);
+      }
+    });
+  }
+
+  // Handle Moodle Synchronization (Plain / Text-to-HTML conversion)
+  if (graderSyncBtn) {
+    graderSyncBtn.addEventListener('click', function () {
+      const grade = graderScoreInput.value.trim();
+      const feedback = graderFeedbackInput.value.trim();
+      
+      if (!grade) {
+        showStatus('Harap masukkan nilai terlebih dahulu!', 'error', graderStatus);
+        return;
+      }
+      
+      if (isSimulationMode) {
+        showStatus('Simulasi: Nilai & Feedback disinkronkan ke Moodle!', 'success', graderStatus);
+        return;
+      }
+      
+      showStatus('Mengirim data penilaian ke Moodle...', 'info', graderStatus);
+      graderSyncBtn.disabled = true;
+      
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { 
+          action: 'syncGraderInfo', 
+          grade: grade, 
+          feedback: feedback,
+          isHtml: false
+        }, function (response) {
+          graderSyncBtn.disabled = false;
+          
+          if (chrome.runtime.lastError || !response) {
+            showStatus('Gagal terhubung dengan Moodle. Silakan refresh halaman.', 'error', graderStatus);
+          } else if (response.success) {
+            showStatus('Sukses sinkronisasi ke Moodle!', 'success', graderStatus);
+            const originalText = graderSyncBtn.innerHTML;
+            graderSyncBtn.innerHTML = '✅ Berhasil Disinkronkan!';
+            setTimeout(() => {
+              graderSyncBtn.innerHTML = originalText;
+            }, 2000);
+          } else {
+            showStatus('Gagal: ' + response.error, 'error', graderStatus);
+          }
+        });
+      });
+    });
+  }
+
+  // Handle Moodle Synchronization (Direct HTML Mode)
+  if (graderSyncHtmlBtn) {
+    graderSyncHtmlBtn.addEventListener('click', function () {
+      const grade = graderScoreInput.value.trim();
+      const feedbackText = graderFeedbackInput.value.trim();
+      const htmlFeedback = convertFeedbackToHtml(feedbackText);
+      
+      if (!grade) {
+        showStatus('Harap masukkan nilai terlebih dahulu!', 'error', graderStatus);
+        return;
+      }
+      
+      if (isSimulationMode) {
+        showStatus('Simulasi: Nilai & Feedback HTML disinkronkan ke Moodle!', 'success', graderStatus);
+        return;
+      }
+      
+      showStatus('Mengirim data penilaian HTML ke Moodle...', 'info', graderStatus);
+      graderSyncHtmlBtn.disabled = true;
+      
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { 
+          action: 'syncGraderInfo', 
+          grade: grade, 
+          feedback: htmlFeedback,
+          isHtml: true
+        }, function (response) {
+          graderSyncHtmlBtn.disabled = false;
+          
+          if (chrome.runtime.lastError || !response) {
+            showStatus('Gagal terhubung dengan Moodle. Silakan refresh halaman.', 'error', graderStatus);
+          } else if (response.success) {
+            showStatus('Sukses sinkronisasi HTML ke Moodle!', 'success', graderStatus);
+            const originalText = graderSyncHtmlBtn.innerHTML;
+            graderSyncHtmlBtn.innerHTML = '✅ Berhasil Disinkronkan!';
+            setTimeout(() => {
+              graderSyncHtmlBtn.innerHTML = originalText;
+            }, 2000);
+          } else {
+            showStatus('Gagal: ' + response.error, 'error', graderStatus);
+          }
+        });
+      });
+    });
+  }
+
+  // Handle AI analysis
+  if (graderAnalyzeBtn) {
+    graderAnalyzeBtn.addEventListener('click', async function () {
+      const selectedProvider = aiProviderSelect.value;
       const selectedModel = aiModelSelect.value;
       let apiKey = '';
       let actualModel = selectedModel;
-
-      // Determine API key and model
-      if (selectedModel === 'auto') {
-        try {
-          apiKey = await getGeminiApiKey();
-          actualModel = 'gemini-2.5-flash';
-        } catch (error) {
-          showStatus('Failed to get API key from server: ' + error.message, 'error', pdfStatus);
-          return;
-        }
-      } else if (selectedModel.startsWith('gemini')) {
-        try {
-          apiKey = await getGeminiApiKey();
-          actualModel = selectedModel;
-        } catch (error) {
-          showStatus('Failed to get API key from server: ' + error.message, 'error', pdfStatus);
-          return;
+      
+      const manualKey = customApiKeyInput.value.trim();
+      
+      if (selectedProvider === 'google') {
+        actualModel = selectedModel === 'auto' ? 'gemini-3.1-flash-lite-preview' : selectedModel;
+        if (manualKey) {
+          apiKey = manualKey;
+        } else {
+          try {
+            apiKey = await getGeminiApiKey();
+          } catch (error) {
+            showStatus('Server down (502). Masukkan Gemini API Key manual.', 'error', graderStatus);
+            return;
+          }
         }
       } else {
-        apiKey = customApiKeyInput.value.trim();
+        apiKey = manualKey;
         if (!apiKey) {
-          showStatus('Please enter API key for ' + selectedModel, 'error', pdfStatus);
+          showStatus('Masukkan API Key manual untuk model non-Google.', 'error', graderStatus);
           return;
         }
         actualModel = selectedModel;
       }
-
-      // Analyze the uploaded PDF
-      pdfResults.innerHTML = '';
-      const analysis = await analyzePDFContent(apiKey, actualModel, uploadedPDF);
-      displayPDFAnalysis(uploadedPDF, analysis);
-
-      showStatus('Analysis completed!', 'success', pdfStatus);
-    } catch (error) {
-      showStatus('Error: ' + error.message, 'error', pdfStatus);
-    } finally {
-      analyzePDFBtn.disabled = false;
-    }
+      
+      // Enable feedback inputs immediately when they request an evaluation
+      setFeedbackFieldsDisabled(false);
+      
+      // Toggle Loader states
+      showStatus('Menganalisis jawaban mahasiswa...', 'info', graderStatus);
+      graderAnalyzeBtn.disabled = true;
+      if (graderGrabBtn) graderGrabBtn.disabled = true;
+      if (graderLoading) graderLoading.style.display = 'block';
+      
+      let textToAnalyze = '';
+      let pdfBase64 = null;
+      let fileMimeType = 'application/pdf';
+      if (isSimulationMode) {
+        textToAnalyze = simulationData.submissionPdfText;
+      } else if (currentGraderData && currentGraderData._convertedPdfBase64) {
+        // Use already-converted PDF (e.g. from .pages CloudConvert flow)
+        pdfBase64 = currentGraderData._convertedPdfBase64;
+        textToAnalyze = 'Tugas mahasiswa telah dikonversi dari format .pages ke PDF. Periksa lampiran dokumen PDF untuk evaluasi lengkap.';
+        fileMimeType = 'application/pdf';
+      } else {
+        if (currentGraderData && currentGraderData.submissionPdfUrl) {
+          const isPdf = (currentGraderData.submissionPdfName || '').toLowerCase().includes('.pdf');
+          showStatus(isPdf ? 'Mengekstrak PDF tugas dari Moodle...' : 'Membaca berkas tugas dari Moodle...', 'info', graderStatus);
+          try {
+            const extractResponse = await new Promise((resolve, reject) => {
+              chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, { 
+                  action: 'extractPDFText', 
+                  url: currentGraderData.submissionPdfUrl,
+                  filename: currentGraderData.submissionPdfName
+                }, function (res) {
+                  if (chrome.runtime.lastError || !res) {
+                    reject(new Error(chrome.runtime.lastError?.message || 'Gagal mengekstrak berkas'));
+                  } else {
+                    resolve(res);
+                  }
+                });
+              });
+            });
+            
+            if (extractResponse.success) {
+              textToAnalyze = extractResponse.text;
+              pdfBase64 = extractResponse.base64 || null;
+              if (extractResponse.mimeType) fileMimeType = extractResponse.mimeType;
+            } else {
+              throw new Error(extractResponse.error || 'Gagal mengekstrak text PDF');
+            }
+          } catch (e) {
+            console.error(e);
+            if (extractedText && extractedText.trim()) {
+              showStatus('Gagal ekstrak PDF. Menggunakan teks halaman Moodle...', 'warning', graderStatus);
+              textToAnalyze = extractedText;
+            } else {
+              showStatus('Gagal ekstrak PDF otomatis. Silakan lakukan evaluasi manual.', 'error', graderStatus);
+              graderAnalyzeBtn.disabled = false;
+              if (graderGrabBtn) graderGrabBtn.disabled = false;
+              if (graderLoading) graderLoading.style.display = 'none';
+              return;
+            }
+          }
+        } else {
+          textToAnalyze = extractedText || 'Tidak ada teks tugas yang terdeteksi.';
+        }
+      }
+      
+      callGraderAI(apiKey, actualModel, textToAnalyze, selectedProvider, pdfBase64, fileMimeType)
+        .then(response => {
+          graderAnalyzeBtn.disabled = false;
+          if (graderGrabBtn) graderGrabBtn.disabled = false;
+          if (graderLoading) graderLoading.style.display = 'none';
+          
+          if (response.success) {
+            let finalOutput = response.answer;
+            
+            // Clean XML and process the result
+            let cleanResponse = finalOutput;
+            const balasanMatch = finalOutput.match(/<balasan>([\s\S]*?)<\/balasan>/i);
+            if (balasanMatch) {
+              cleanResponse = balasanMatch[1].trim();
+            }
+            
+            // Purge em-dash character completely to prevent rendering errors
+            cleanResponse = cleanResponse.replace(/—/g, '-');
+            
+            // Parse out score and feedback
+            const gradeMatch = cleanResponse.match(/\[NILAI\]\s*(\d+)/i) || cleanResponse.match(/Nilai:\s*(\d+)/i) || cleanResponse.match(/Score:\s*(\d+)/i);
+            let score = 85;
+            if (gradeMatch) {
+              score = parseInt(gradeMatch[1].trim(), 10);
+            }
+            
+            let feedback = cleanResponse.replace(/\[NILAI\]\s*\d+/i, '').trim();
+            feedback = feedback.replace(/Nilai:\s*\d+/i, '').trim();
+            feedback = feedback.replace(/^["'*`\s]+/, '');
+            
+            if (graderScoreInput) graderScoreInput.value = score;
+            if (graderFeedbackInput) graderFeedbackInput.value = feedback;
+            
+            showStatus('Evaluasi AI selesai!', 'success', graderStatus);
+          } else {
+            showStatus('Gagal: ' + response.error, 'error', graderStatus);
+          }
+        })
+        .catch(error => {
+          graderAnalyzeBtn.disabled = false;
+          if (graderGrabBtn) graderGrabBtn.disabled = false;
+          if (graderLoading) graderLoading.style.display = 'none';
+          showStatus('Error: ' + error.message, 'error', graderStatus);
+        });
+    });
   }
 
-  // Analyze PDF content with AI
-  async function analyzePDFContent(apiKey, model, pdf) {
-    const prompt = `Anda adalah seorang dosen yang menganalisis dokumen PDF dalam konteks forum diskusi mahasiswa.
-
-Nama PDF: ${pdf.name}
-
-Konten PDF:
-${pdf.text}
-
-Pertanyaan diskusi dari forum:
-${extractedText}
-
-RAT Context (jika tersedia):
-${ratText}
-
-Berikan analisis yang mencakup:
-1. **Ringkasan Singkat**: Ringkasan isi PDF dalam 2-3 kalimat
-2. **Relevansi dengan Pertanyaan**: Apakah PDF ini relevan dengan pertanyaan diskusi? Berikan penilaian 1-10 dan jelaskan alasannya
-3. **Kontribusi untuk Jawaban**: Bagaimana PDF ini dapat membantu menjawab pertanyaan diskusi?
-4. **Rekomendasi**: Apakah mahasiswa sebaiknya menggunakan PDF ini sebagai referensi? Mengapa?
-
-Gunakan bahasa Indonesia yang natural dan ramah, seperti dosen yang sedang memberikan feedback.`;
-
-    try {
-      const response = await callAIAPI(apiKey, model, prompt);
-      return response;
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  // Display PDF analysis results
-  function displayPDFAnalysis(pdf, analysis) {
-    const analysisDiv = document.createElement('div');
-    analysisDiv.style.cssText = `
-      margin: 10px 0;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    `;
-
-    if (analysis.success) {
-      analysisDiv.innerHTML = `
-        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.name}</h4>
-        <div style="font-size: 12px; line-height: 1.4; color: rgba(255,255,255,0.8);">
-          ${analysis.answer}
-        </div>
-      `;
-    } else {
-      analysisDiv.innerHTML = `
-        <h4 style="margin: 0 0 10px 0; font-size: 14px; color: rgba(255,255,255,0.9);">📄 ${pdf.name}</h4>
-        <div style="font-size: 12px; color: rgba(255, 100, 100, 0.8);">
-          Error: ${analysis.error}
-        </div>
-      `;
+  async function callGraderAI(apiKey, model, submissionText, provider = 'google', pdfBase64 = null, mimeType = 'application/pdf') {
+    const hour = new Date().getHours();
+    let waktuSekarang = "pagi";
+    if (hour >= 10 && hour < 15) {
+      waktuSekarang = "siang";
+    } else if (hour >= 15 && hour < 18) {
+      waktuSekarang = "sore";
+    } else if (hour >= 18 || hour < 4) {
+      waktuSekarang = "malam";
     }
 
-    pdfResults.appendChild(analysisDiv);
+    let prompt = `Anda adalah seorang Dosen/Tutor Universitas Terbuka yang sangat profesional, ramah, dan teliti dalam memberikan penilaian dan umpan balik tugas mahasiswa.
+
+Silakan evaluasi tugas mahasiswa berikut ini:
+
+=== NAMA MAHASISWA ===
+${currentGraderData ? currentGraderData.studentName : 'PRASTIANO NOER ADITYA'}
+
+=== TUGAS MAHASISWA ===
+${submissionText}`;
+
+    // Jika file PDF biner tersedia, instruksikan Gemini secara eksplisit untuk membaca dokumen asli secara visual
+    if (pdfBase64 && provider === 'google') {
+      prompt += `\n\n=== INFORMASI DOKUMEN VISUAL (SANGAT PENTING) ===
+Dokumen asli tugas mahasiswa terlampir langsung sebagai dokumen PDF biner. Selain membaca teks hasil ekstraksi di atas, Anda WAJIB memeriksa lampiran dokumen PDF asli tersebut secara visual untuk membaca, menganalisis, dan mengevaluasi elemen-elemen grafis seperti tangkapan layar (screenshots) running program R/RStudio, grafik, chart, diagram, tabel dalam bentuk gambar, rumus matematika, atau teks/tulisan tangan yang tidak dapat diekstraksi ke teks biasa. Berikan penilaian berdasarkan seluruh konten visual dan tekstual tersebut.`;
+    }
+
+    if (ratText) {
+      prompt += `\n\n=== RANCANGAN AKTIVITAS TUTORIAL (RAT) ===\n${ratText}`;
+    }
+
+    // Ambil acuan kriteria penilaian (rubrik) dari input
+    const acuanKriteria = graderAcuanInput ? graderAcuanInput.value.trim() : '';
+    if (acuanKriteria) {
+      prompt += `\n\n=== ACUAN PENILAIAN / RUBRIK TUGAS ===\n${acuanKriteria}\n\nSANGAT PENTING: Anda WAJIB mematuhi seluruh instruksi khusus di dalam 'ACUAN PENILAIAN / RUBRIK TUGAS' di atas dengan prioritas tertinggi! Jika terdapat pelanggaran akademik (plagiarisme, pola bahasa AI, atau penggunaan bahasa non-R) sebagaimana diuraikan dalam rubrik, berikan nilai [NILAI] 0 beserta uraian bukti deteksi pelanggaran yang sangat jelas dan terperinci.`;
+      
+      if (ratText) {
+        prompt += `\n\nSelain mematuhi rubrik tugas, Anda juga WAJIB menyelaraskan seluruh evaluasi dan umpan balik Anda agar sesuai dengan Capaian Pembelajaran (CPMK) dan Deskripsi Mata Kuliah yang tercantum di dalam RANCANGAN AKTIVITAS TUTORIAL (RAT) di atas.`;
+      }
+    } else if (ratText) {
+      prompt += `\n\n=== ACUAN PENILAIAN / RUBRIK TUGAS ===\nEvaluasilah tugas mahasiswa berdasarkan Capaian Pembelajaran (CPMK) dan Deskripsi Mata Kuliah yang tercantum di dalam RANCANGAN AKTIVITAS TUTORIAL (RAT) di atas.`;
+    }
+
+    prompt += `\n\nBerikan evaluasi yang memenuhi kriteria berikut:
+1. Berikan nilai numerik (0-100) berdasarkan kualitas akademis, akurasi jawaban, orisinalitas, dan pemahaman materi. Tuliskan nilai tersebut di awal dengan format [NILAI] <skor> (Contoh: [NILAI] 85).
+2. Tulis catatan umpan balik yang terstruktur, ramah, konstruktif, dan memotivasi mahasiswa.
+3. Sebutkan nama mahasiswa secara sopan dan ramah di awal (Contoh: "Selamat ${waktuSekarang} Prastiano, ...").
+4. Evaluasi apakah mahasiswa menyertakan referensi/sitasi akademik yang proper. Berikan saran perbaikan referensi jika belum ada.
+5. Sebutkan kelebihan tugas mereka serta area spesifik yang perlu ditingkatkan secara akademis.
+6. Gunakan bahasa Indonesia yang mengalir natural, tanpa bullet points berlebihan, ramah, layaknya asisten dosen sejati.
+7. JANGAN PERNAH menyertakan proses berpikir, draf evaluasi, atau tag XML di dalam tag <balasan>.
+8. Anda WAJIB membungkus hasil akhir (termasuk tag [NILAI] dan teks evaluasi) secara eksklusif di dalam tag <balasan> dan </balasan>.
+9. SANGAT PENTING: JANGAN SEKALI-KALI menggunakan karakter em-dash (—) di dalam seluruh teks umpan balik atau nilai. Selalu gunakan tanda hubung standar (-) jika diperlukan.
+
+Format balasan Anda harus seperti ini:
+<balasan>
+[NILAI] 85
+Selamat ${waktuSekarang} Prastiano, terima kasih atas tugas yang telah dikirimkan. ...
+</balasan>
+
+Tulis evaluasi Anda secara profesional:`;
+
+    return await callAIAPI(apiKey, model, prompt, provider, pdfBase64, mimeType);
   }
 });
 

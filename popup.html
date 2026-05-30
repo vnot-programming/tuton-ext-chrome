@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <script src="lib/pdf.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -49,6 +50,11 @@
       border-radius: 8px;
       padding: 3px;
       margin-bottom: 15px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .tab-sheet-button {
@@ -288,6 +294,11 @@
       background: rgba(0, 0, 0, 0.15);
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.12);
+      position: sticky;
+      bottom: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .footer p {
@@ -300,6 +311,109 @@
     .footer strong {
       color: rgba(255, 255, 255, 0.95);
       font-weight: 600;
+    }
+
+    /* Grader Penilaian Styling */
+    .badgePremium {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      margin-bottom: 8px;
+    }
+
+    .badgePremium.simulated {
+      background: rgba(255, 165, 0, 0.25);
+      border-color: rgba(255, 165, 0, 0.4);
+    }
+
+    .dotActive {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #32CD32;
+      box-shadow: 0 0 8px #32CD32;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+
+    .dotActive.simulated {
+      background-color: #FFA500;
+      box-shadow: 0 0 8px #FFA500;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(0.95);
+        opacity: 0.5;
+      }
+    }
+
+    .glassCard {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .graderGrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 6px;
+    }
+
+    .graderGridItem {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-bottom: 4px;
+    }
+
+    .graderGridItem strong {
+      color: white;
+    }
+
+    .penilaianActionBtn {
+      background: linear-gradient(135deg, #1E90FF 0%, #00BFFF 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .penilaianActionBtn:hover {
+      background: linear-gradient(135deg, #00BFFF 0%, #1E90FF 100%);
+    }
+
+    .syncBtn {
+      background: linear-gradient(135deg, #2E8B57 0%, #32CD32 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .syncBtn:hover {
+      background: linear-gradient(135deg, #32CD32 0%, #2E8B57 100%);
     }
   </style>
 </head>
@@ -331,10 +445,10 @@
               <option value="anthropic">Anthropic</option>
               <option value="others">Others (Open Access)</option>
             </select>
-            
+
             <select id="aiModel" class="api-key-input" style="flex: 2; margin-bottom: 0; padding: 8px 12px;">
               <!-- Options populated by JS -->
-              <option value="auto">Auto (Gemini 3.1 Flash Lite)</option>
+              <option value="auto">Auto (OpenRouter Free Router)</option>
             </select>
           </div>
           <div id="customApiKeySection" style="display: none;">
@@ -405,42 +519,172 @@
       <!-- Penilaian Tab Sheet -->
       <div id="penilaianSheet" class="tab-sheet">
         <div class="section">
-          <h3>📊 Analisis PDF & Penilaian</h3>
-          <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 15px;">
-            Upload PDF yang telah didownload dari diskusi mahasiswa untuk dianalisis relevansinya dengan pertanyaan
-            diskusi.
-          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: white;">📊 Penilaian Tugas Moodle</h3>
+            <!-- <div id="graderModeBadge" class="badgePremium simulated" style="margin-bottom: 0;">
+              <span id="graderModeDot" class="dotActive simulated"></span> 
+              <span id="graderModeText">Mode Simulasi</span>
+            </div> -->
+          </div>
 
-          <div style="margin-bottom: 15px;">
-            <div style="position: relative; margin-bottom: 15px;">
-              <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
-              <label for="pdfUpload"
-                style="display: block; width: 100%; max-width: 100%; padding: 15px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 12px; box-sizing: border-box;">
-                📁 <strong>Click untuk Upload PDF</strong><br>
-                <span style="font-size: 10px; color: rgba(255,255,255,0.6);">Drag & drop atau click untuk memilih file
-                  PDF</span>
+          <!-- <p style="font-size: 9px; color: rgba(255,255,255,0.7); margin-bottom: 12px; line-height: 1.4;">
+            Secara otomatis mengambil data tugas mahasiswa dari halaman grader Moodle, melakukan evaluasi berbasis AI,
+            dan mengirimkan hasil nilai & feedback langsung ke Moodle.
+          </p> -->
+
+          <!-- Identitas Mahasiswa Card -->
+          <div class="glassCard">
+            <h4
+              style="font-size: 12px; margin: 0 0 8px 0; color: hsl(145, 80%, 75%); font-weight: 700; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4px; letter-spacing: 0.3px;">
+              👤 IDENTITAS
+              <span id="graderCourseCode"
+                style="color: rgba(255, 255, 255, 0.9); font-size: 10px; background: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 4px;">XXXXXXXX.XX</span>
+            </h4>
+            <div class="graderGrid">
+              <div class="graderGridItem">Nama:<strong id="graderStudentName">-</strong></div>
+              <div class="graderGridItem">NIM:<strong id="graderStudentNim">-</strong></div>
+              <div class="graderGridItem">Email:<strong id="graderStudentEmail">email@ecampus.ut.ac.id</strong>
+              </div>
+              <div class="graderGridItem">Batas Waktu:<strong id="graderDueDate">-</strong></div>
+              <div class="graderGridItem">Aktivitas:<strong id="graderAssignName">-</strong></div>
+            </div>
+          </div>
+
+          <!-- Acuan Penilaian / Rubrik Card -->
+          <div class="glassCard" style="padding: 12px; margin-bottom: 12px;">
+            <h4
+              style="font-size: 12px; margin: 0 0 8px 0; color: hsl(45, 95%, 72%); font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4px; letter-spacing: 0.3px;">
+              📖 ACUAN PENILAIAN / RUBRIK TUGAS
+            </h4>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 6px; line-height: 1.3;">
+              Aturan khusus evaluasi yang wajib dipatuhi oleh AI saat memeriksa jawaban (nilai 0 untuk
+              plagiarisme, sudut pandang orang pertama, dll).
+            </p>
+
+            <!-- Uploader Soal PDF -->
+            <div style="margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;">
+              <label for="graderSoalUpload"
+                style="font-size: 10px; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 600;">
+                📁 Upload Soal Tugas (Wajib PDF):
               </label>
+              <input type="file" id="graderSoalUpload" accept=".pdf"
+                style="font-size: 10px; color: white; background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); border-radius: 6px; padding: 6px; width: 100%; cursor: pointer;">
+              <div id="graderSoalStatus" class="status info"
+                style="font-size: 9px; padding: 4px; margin-top: 4px; display: none; text-align: left;"></div>
             </div>
-            <div id="pdfStatus" class="status" style="display: none;"></div>
+
+            <textarea id="graderAcuanInput"
+              placeholder="Masukkan kriteria acuan penilaian (rubrik) atau upload berkas soal di atas..."
+              style="min-height: 80px; font-size: 11px; line-height: 1.4; color: #333; font-weight: 500;"></textarea>
           </div>
 
-          <div id="pdfInfo" style="display: none; margin-bottom: 15px;">
-            <div
-              style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);">
-              <h4 style="font-size: 14px; margin: 0 0 8px 0; color: rgba(255,255,255,0.9);">📄 File PDF:</h4>
-              <div id="pdfFileName" style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 5px;"></div>
-              <div id="pdfFileSize" style="font-size: 10px; color: rgba(255,255,255,0.6);"></div>
+          <!-- PDF Dokumen Card -->
+          <div class="glassCard" style="padding: 10px; margin-bottom: 12px;">
+            <h4
+              style="font-size: 12px; margin: 0 0 8px 0; color: hsl(195, 85%, 75%); font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4px; letter-spacing: 0.3px;">
+              📄 DOKUMEN TUGAS MAHASISWA
+            </h4>
+            <div id="graderPdfInfoContainer"
+              style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
+              <div id="graderPdfName" style="font-size: 11px; color: white; font-weight: 500; word-break: break-all;">
+                -</div>
+              <div id="graderPdfSize" style="font-size: 9px; color: rgba(255,255,255,0.5);">Size: -</div>
+            </div>
+
+            <!-- CloudConvert Conversion Panel (shown only for .pages/.docx files) -->
+            <div id="graderConvertPanel"
+              style="display: none; background: rgba(255,140,0,0.1); border: 1px solid rgba(255,165,0,0.4); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+              <!-- Header -->
+              <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 5px;">
+                <span style="font-size: 13px;">⚠️</span>
+                <span style="font-size: 10px; color: hsl(38,92%,75%); font-weight: 700; line-height: 1.3;">Berkas Khusus
+                  — Perlu Konversi CloudConvert</span>
+              </div>
+
+              <!-- Description compact -->
+              <p style="font-size: 9px; color: rgba(255,255,255,0.65); margin: 0 0 8px 0; line-height: 1.5;">
+                Salin MD5 hash ke whitelist CloudConvert, lalu tekan Konversi.
+              </p>
+
+              <!-- MD5 row: label + copy button inline -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label style="font-size: 9px; color: rgba(255,255,255,0.6); font-weight: 600;">MD5 Hash (
+                  Whitelist):</label>
+                <button id="graderMd5CopyBtn" title="Salin MD5"
+                  style="padding: 2px 8px; font-size: 9px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; color: white; cursor: pointer; white-space: nowrap; line-height: 1.6;">📋
+                  Salin</button>
+              </div>
+
+              <!-- Full-width readonly input — no wrapping, horizontally scrollable -->
+              <input id="graderMd5Display" readonly type="text" value="-"
+                style="width: 100%; box-sizing: border-box; font-family: 'Courier New', monospace; font-size: 10px; color: hsl(45,100%,72%); background: rgba(0,0,0,0.35); border: 1px solid rgba(255,165,0,0.25); border-radius: 4px; padding: 5px 8px; outline: none; cursor: text; margin-bottom: 8px; letter-spacing: 0.5px;">
+
+              <!-- Convert button -->
+              <button id="graderConvertBtn"
+                style="width: 100%; padding: 8px 6px; font-size: 10px; background: linear-gradient(135deg, hsl(38,90%,46%), hsl(28,88%,40%)); border: none; border-radius: 6px; color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: opacity 0.2s;">
+                🔄 Konversi ke PDF via CloudConvert
+              </button>
+              <div id="graderConvertStatus" class="status" style="display: none; margin-top: 6px; font-size: 9px;">
+              </div>
+            </div>
+
+
+            <div style="display: flex; gap: 6px;">
+              <button id="graderAnalyzeBtn" class="penilaianActionBtn"
+                style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;">🤖 Evaluasi Tugas</button>
+              <button id="graderGrabBtn"
+                style="width: auto; padding: 8px 12px; font-size: 11px; margin-bottom: 0; background: rgba(255,255,255,0.1);">🔄
+                Ambil Ulang</button>
             </div>
           </div>
 
-          <div id="pdfAnalysis" style="display: none;">
-            <h4 style="font-size: 14px; margin-bottom: 10px; color: rgba(255,255,255,0.9);">🤖 Analisis AI:</h4>
-            <div id="pdfResults"></div>
-            <button id="analyzePDF"
-              style="width: 100%; padding: 10px; border: none; border-radius: 6px; background: rgba(46, 139, 87, 0.4); color: white; font-size: 12px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;">
-              🚀 Analisis PDF
-            </button>
+          <!-- Grader Loading Spinner -->
+          <div class="loading" id="graderLoading"
+            style="display: none; text-align: center; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); margin-bottom: 12px; backdrop-filter: blur(10px);">
+            <div class="spinner" style="margin-bottom: 6px;"></div>
+            <div style="font-size: 11px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">🤖 Mengevaluasi tugas
+              mahasiswa...</div>
           </div>
+
+          <!-- Form Input Penilaian -->
+          <div class="glassCard" style="padding: 12px; margin-bottom: 0;">
+            <h4
+              style="font-size: 12px; margin: 0 0 8px 0; color: hsl(45, 95%, 72%); font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4px; letter-spacing: 0.3px;">
+              📝 EVALUASI & FEEDBACK
+            </h4>
+
+            <div style="margin-bottom: 8px;">
+              <label style="font-size: 10px; color: rgba(255,255,255,0.7); display: block; margin-bottom: 3px;">Skor
+                Nilai (0 - 100):</label>
+              <input type="number" id="graderScoreInput" class="api-key-input" placeholder="Masukkan nilai" min="0"
+                max="100" style="margin-bottom: 0;" value="85">
+            </div>
+
+            <div style="margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <label style="font-size: 10px; color: rgba(255,255,255,0.7); display: block; margin-bottom: 0;">Umpan
+                  Balik (Feedback Comments):</label>
+                <button id="graderCopyHtmlBtn"
+                  style="width: auto; padding: 2px 8px; font-size: 9px; margin-bottom: 0; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; color: white; cursor: pointer; transition: all 0.2s;">📋
+                  Copy HTML</button>
+              </div>
+              <textarea id="graderFeedbackInput" placeholder="Tulis catatan umpan balik..."
+                style="min-height: 80px; font-size: 11px; line-height: 1.4; color: #333; font-weight: 500;">-</textarea>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <button id="graderSyncBtn" class="syncBtn"
+                style="flex: 1; padding: 10px; font-size: 11px; margin-bottom: 0; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                🚀 Kirim Biasa
+              </button>
+              <button id="graderSyncHtmlBtn" class="syncBtn"
+                style="flex: 1; padding: 10px; font-size: 11px; margin-bottom: 0; display: flex; align-items: center; justify-content: center; gap: 4px; background: linear-gradient(135deg, #1E90FF 0%, #00BFFF 100%);">
+                🌐 Kirim HTML
+              </button>
+            </div>
+          </div>
+
+          <div id="graderStatus" class="status" style="display: none; margin-top: 10px;"></div>
         </div>
       </div>
       <!-- /penilaianSheet -->
@@ -452,7 +696,9 @@
           <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 15px;">
             Rekam video menggunakan webcam. Hasil rekaman akan disimpan secara lokal di perangkat Anda.
           </p>
-          <button id="openRecorderBtn" style="background: rgba(46, 139, 87, 0.8); border: 1px solid rgba(46, 139, 87, 1);">Buka Jendela Perekam</button>
+          <button id="openRecorderBtn"
+            style="background: rgba(46, 139, 87, 0.8); border: 1px solid rgba(46, 139, 87, 1);">Buka Jendela
+            Perekam</button>
         </div>
       </div>
       <!-- /webcamSheet -->
@@ -461,7 +707,7 @@
 
   <div class="footer">
     <p>Made with ❤️ by <strong>Feri Febria Laksana</strong></p>
-    <p>Using AI • Version 1.7.0</p>
+    <p id="appVersion">Using AI • Version 1.7.6</p>
     <p style="margin-top: 10px;">
       <a href="https://saweria.co/vnot01" target="_blank"
         style="color: rgba(255,255,255,0.95); text-decoration: none; font-weight: 600; padding: 5px 10px; background: rgba(255, 255, 255, 0.15); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.25); transition: all 0.3s ease;">

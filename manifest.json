@@ -17,7 +17,10 @@
     "https://api.deepseek.com/*",
     "https://api.mistral.ai/*",
     "https://open.bigmodel.cn/*",
-    "https://dashscope.aliyuncs.com/*"
+    "https://dashscope.aliyuncs.com/*",
+    "https://api.sandbox.cloudconvert.com/*",
+    "https://storage.googleapis.com/*",
+    "https://*.cloudconvert.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -29,6 +32,8 @@
         "https://elearning.ut.ac.id/*"
       ],
       "js": [
+        "lib/pdf.min.js",
+        "lib/pdf.worker.min.js",
         "content.js"
       ],
       "run_at": "document_end"
